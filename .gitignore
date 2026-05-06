@@ -1,0 +1,15 @@
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/resources/gradle.properties
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+.vscode/
+bin/
+.DS_Store
+*.swp
+*.bak
+*.tmp
