@@ -1,3 +1,38 @@
+# Gradle / build
+.gradle/
+build/
+out/
+bin/
+
+# Generated
+generated-sources/
+**/generated-sources/
+
+# Java
+*.class
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Logs
+*.log
+
+# Environment / secrets
+.env
+.env.*
+*.key
+*.pem
+
+# H2
+*.mv.db
+*.trace.db
+data/
+
+# OS
+.DS_Store
+Thumbs.db
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
