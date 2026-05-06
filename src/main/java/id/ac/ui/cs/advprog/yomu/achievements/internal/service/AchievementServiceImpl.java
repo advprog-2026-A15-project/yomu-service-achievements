@@ -3,11 +3,8 @@ package id.ac.ui.cs.advprog.yomu.achievements.internal.service;
 import id.ac.ui.cs.advprog.yomu.achievements.internal.dto.*;
 import id.ac.ui.cs.advprog.yomu.achievements.internal.model.*;
 import id.ac.ui.cs.advprog.yomu.achievements.internal.repository.AchievementRepository;
-import id.ac.ui.cs.advprog.yomu.shared.event.AchievementUnlockedEvent;
-import id.ac.ui.cs.advprog.yomu.shared.event.LeagueActivityEvent;
-import id.ac.ui.cs.advprog.yomu.shared.event.LearningCompletedEvent;
-import id.ac.ui.cs.advprog.yomu.shared.event.QuizCompletedEvent;
-import org.springframework.context.ApplicationEventPublisher;
+import id.ac.ui.cs.advprog.yomu.shared.event.*;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,13 +25,13 @@ import java.util.UUID;
 public class AchievementServiceImpl implements AchievementService {
 
     private final AchievementRepository repository;
-    private final ApplicationEventPublisher eventPublisher;
+    private final RabbitTemplate rabbitTemplate;
 
     public AchievementServiceImpl(
             AchievementRepository repository,
-            ApplicationEventPublisher eventPublisher) {
+            RabbitTemplate rabbitTemplate) {
         this.repository = repository;
-        this.eventPublisher = eventPublisher;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @Override
@@ -207,7 +204,7 @@ public class AchievementServiceImpl implements AchievementService {
             repository.saveAchievementProgress(userId, achievement.id(), newCount, unlockedAt);
 
             if (unlockedAt != null) {
-                eventPublisher.publishEvent(new AchievementUnlockedEvent(
+                rabbitTemplate.convertAndSend("yomu.achievement.unlocked", new AchievementUnlockedEvent(
                     userId, achievement.code(), achievement.name(), unlockedAt
                 ));
             }
@@ -227,6 +224,12 @@ public class AchievementServiceImpl implements AchievementService {
 
             int newCount = state.progressCount() + 1;
             repository.saveDailyMissionProgress(userId, mission.id(), newCount, null);
+
+            if (newCount == mission.targetCount()) {
+                rabbitTemplate.convertAndSend("yomu.daily.mission.completed", new DailyMissionCompletedEvent(
+                    userId, mission.id(), mission.name(), Instant.now()
+                ));
+            }
         }
     }
 
