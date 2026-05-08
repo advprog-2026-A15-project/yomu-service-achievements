@@ -28,6 +28,8 @@ public interface AchievementRepository {
 
     void saveAchievementProgress(UUID userId, UUID achievementId, int progressCount, Instant unlockedAt);
 
+    void pinAchievement(UUID userId, UUID achievementId, boolean pin);
+
     DailyMission saveDailyMission(DailyMission mission);
 
     boolean existsByDailyMissionCode(String code);

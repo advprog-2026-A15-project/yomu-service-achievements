@@ -11,6 +11,7 @@ public record AchievementProgressResponse(
     String metric,
     int milestone,
     int progress,
-    Instant unlockedAt
+    Instant unlockedAt,
+    boolean isPinned
 ) {
 }

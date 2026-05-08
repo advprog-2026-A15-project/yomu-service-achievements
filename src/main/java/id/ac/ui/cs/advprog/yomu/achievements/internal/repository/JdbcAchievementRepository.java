@@ -51,10 +51,12 @@ public class JdbcAchievementRepository implements AchievementRepository {
                 achievement_id UUID NOT NULL,
                 progress_count INTEGER NOT NULL,
                 unlocked_at TIMESTAMP,
+                is_pinned BOOLEAN NOT NULL DEFAULT FALSE,
                 updated_at TIMESTAMP NOT NULL,
                 PRIMARY KEY (user_id, achievement_id)
             )
             """);
+        jdbcTemplate.execute("ALTER TABLE user_achievement_progress ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN NOT NULL DEFAULT FALSE");
         jdbcTemplate.execute("""
             CREATE TABLE IF NOT EXISTS daily_missions (
                 id UUID PRIMARY KEY,
@@ -153,34 +155,37 @@ public class JdbcAchievementRepository implements AchievementRepository {
     @Override
     public List<AchievementProgress> findAchievementProgressForUser(UUID userId) {
         return jdbcTemplate.query("""
-            SELECT a.id, a.code, a.name, a.description, a.metric, a.milestone, a.active, a.created_at,
-                   COALESCE(p.progress_count, 0) AS progress_count,
-                   p.unlocked_at
-            FROM achievements a
-            LEFT JOIN user_achievement_progress p
-                ON p.achievement_id = a.id AND p.user_id = ?
-            WHERE a.active = TRUE
-            ORDER BY a.created_at ASC, a.name ASC
-            """,
-            (rs, rowNum) -> new AchievementProgress(
-                achievementRowMapper().mapRow(rs, rowNum),
-                rs.getInt("progress_count"),
-                timestampToInstant(rs.getTimestamp("unlocked_at"))
-            ),
-            userId
-        );
+             SELECT a.id, a.code, a.name, a.description, a.metric, a.milestone, a.active, a.created_at,
+                    COALESCE(p.progress_count, 0) AS progress_count,
+                    p.unlocked_at,
+                    COALESCE(p.is_pinned, FALSE) AS is_pinned
+             FROM achievements a
+             LEFT JOIN user_achievement_progress p
+                 ON p.achievement_id = a.id AND p.user_id = ?
+             WHERE a.active = TRUE
+             ORDER BY a.created_at ASC, a.name ASC
+             """,
+             (rs, rowNum) -> new AchievementProgress(
+                 achievementRowMapper().mapRow(rs, rowNum),
+                 rs.getInt("progress_count"),
+                 timestampToInstant(rs.getTimestamp("unlocked_at")),
+                 rs.getBoolean("is_pinned")
+             ),
+             userId
+         );
     }
 
     @Override
     public Optional<AchievementProgressState> findAchievementProgressState(UUID userId, UUID achievementId) {
         return jdbcTemplate.query("""
-            SELECT progress_count, unlocked_at
+            SELECT progress_count, unlocked_at, is_pinned
             FROM user_achievement_progress
             WHERE user_id = ? AND achievement_id = ?
             """,
             (rs, rowNum) -> new AchievementProgressState(
                 rs.getInt("progress_count"),
-                timestampToInstant(rs.getTimestamp("unlocked_at"))
+                timestampToInstant(rs.getTimestamp("unlocked_at")),
+                rs.getBoolean("is_pinned")
             ),
             userId,
             achievementId
@@ -207,14 +212,29 @@ public class JdbcAchievementRepository implements AchievementRepository {
 
         jdbcTemplate.update("""
             INSERT INTO user_achievement_progress
-                (user_id, achievement_id, progress_count, unlocked_at, updated_at)
-            VALUES (?, ?, ?, ?, ?)
+                (user_id, achievement_id, progress_count, unlocked_at, is_pinned, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?)
             """,
             userId,
             achievementId,
             progressCount,
             timestampOrNull(unlockedAt),
+            false,
             Timestamp.from(updatedAt)
+        );
+    }
+
+    @Override
+    public void pinAchievement(UUID userId, UUID achievementId, boolean pin) {
+        jdbcTemplate.update("""
+            UPDATE user_achievement_progress
+            SET is_pinned = ?, updated_at = ?
+            WHERE user_id = ? AND achievement_id = ?
+            """,
+            pin,
+            Timestamp.from(Instant.now()),
+            userId,
+            achievementId
         );
     }
 

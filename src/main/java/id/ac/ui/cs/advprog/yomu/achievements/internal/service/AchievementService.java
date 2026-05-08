@@ -26,6 +26,8 @@ public interface AchievementService {
 
     ClaimRewardResponse claimDailyMissionReward(UUID missionId, UUID userId);
 
+    void pinAchievement(UUID userId, UUID achievementId, boolean pin);
+
     void recordReadingCompleted(LearningCompletedEvent event);
 
     void recordQuizCompleted(QuizCompletedEvent event);

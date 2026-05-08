@@ -133,6 +133,21 @@ public class AchievementServiceImpl implements AchievementService {
 
     @Override
     @Transactional
+    public void pinAchievement(UUID userId, UUID achievementId, boolean pin) {
+        AchievementProgressState state = repository.findAchievementProgressState(userId, achievementId)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Progres achievement tidak ditemukan"));
+
+        if (state.unlockedAt() == null) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "Hanya achievement yang sudah terbuka yang dapat dipajang");
+        }
+
+        repository.pinAchievement(userId, achievementId, pin);
+    }
+
+    @Override
+    @Transactional
     public void recordReadingCompleted(LearningCompletedEvent event) {
         String sourceId = event.bacaanId().toString();
         boolean isNewEvent = repository.saveActivityEvent(
@@ -192,7 +207,7 @@ public class AchievementServiceImpl implements AchievementService {
         for (Achievement achievement : achievements) {
             AchievementProgressState state = repository
                 .findAchievementProgressState(userId, achievement.id())
-                .orElse(new AchievementProgressState(0, null));
+                .orElse(new AchievementProgressState(0, null, false));
 
             if (state.unlockedAt() != null) {
                 continue; // sudah tercapai
@@ -245,7 +260,7 @@ public class AchievementServiceImpl implements AchievementService {
         return new AchievementProgressResponse(
             a.id(), a.code(), a.name(), a.description(),
             a.metric().name(), a.milestone(),
-            p.progressCount(), p.unlockedAt()
+            p.progressCount(), p.unlockedAt(), p.isPinned()
         );
     }
 
