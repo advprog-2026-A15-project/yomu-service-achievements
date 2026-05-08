@@ -12,7 +12,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -23,6 +25,7 @@ import java.util.UUID;
  */
 @Service
 public class AchievementServiceImpl implements AchievementService {
+    private static final int DEFAULT_DAILY_MISSION_REWARD = 10;
 
     private final AchievementRepository repository;
     private final RabbitTemplate rabbitTemplate;
@@ -37,17 +40,21 @@ public class AchievementServiceImpl implements AchievementService {
     @Override
     @Transactional
     public AchievementResponse createAchievement(CreateAchievementRequest request) {
-        if (repository.existsByAchievementCode(request.code())) {
+        String code = resolveCode(request.code(), request.name());
+        AchievementMetric metric = requireMetric(request.metric());
+        String description = normalizeNullableText(request.description());
+
+        if (repository.existsByAchievementCode(code)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
-                "Achievement dengan kode '" + request.code() + "' sudah ada");
+                "Achievement dengan kode '" + code + "' sudah ada");
         }
 
         Achievement achievement = new Achievement(
             UUID.randomUUID(),
-            request.code(),
-            request.name(),
-            request.description(),
-            request.metric(),
+            code,
+            request.name().trim(),
+            description,
+            metric,
             request.milestone(),
             true,
             Instant.now()
@@ -67,21 +74,33 @@ public class AchievementServiceImpl implements AchievementService {
     @Override
     @Transactional
     public DailyMissionResponse createDailyMission(CreateDailyMissionRequest request) {
-        if (repository.existsByDailyMissionCode(request.code())) {
+        String code = resolveCode(request.code(), request.name());
+        AchievementMetric metric = requireMetric(request.metric());
+        String description = normalizeNullableText(request.description());
+        int rewardPoints = request.rewardPoints() == null ? 0 : request.rewardPoints();
+        LocalDate activeFrom = request.activeFrom() != null ? request.activeFrom() : LocalDate.now();
+        LocalDate activeUntil = request.activeUntil() != null ? request.activeUntil() : activeFrom.plusDays(1);
+
+        if (!activeUntil.isAfter(activeFrom)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Tanggal selesai daily mission harus setelah tanggal mulai");
+        }
+
+        if (repository.existsByDailyMissionCode(code)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
-                "Daily mission dengan kode '" + request.code() + "' sudah ada");
+                "Daily mission dengan kode '" + code + "' sudah ada");
         }
 
         DailyMission mission = new DailyMission(
             UUID.randomUUID(),
-            request.code(),
-            request.name(),
-            request.description(),
-            request.metric(),
+            code,
+            request.name().trim(),
+            description,
+            metric,
             request.targetCount(),
-            request.rewardPoints(),
-            request.activeFrom() != null ? request.activeFrom() : LocalDate.now(),
-            request.activeUntil() != null ? request.activeUntil() : LocalDate.now().plusDays(1),
+            rewardPoints,
+            activeFrom,
+            activeUntil,
             Instant.now()
         );
 
@@ -180,8 +199,68 @@ public class AchievementServiceImpl implements AchievementService {
     }
 
     @Override
+    @Transactional
+    public void recordCommentCreated(CommentCreatedEvent event) {
+        UUID userId = UUID.fromString(event.userId());
+        boolean isNewEvent = repository.saveActivityEvent(
+            userId,
+            AchievementMetric.COMMENT_CREATED,
+            event.commentId(),
+            event.timestamp()
+        );
+
+        if (isNewEvent) {
+            updateAchievementAndMissionProgress(userId, AchievementMetric.COMMENT_CREATED);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void recordClanPromoted(ClanPromotedEvent event) {
+        String sourceId = event.seasonId() + ":" + event.clanId() + ":" + event.userId() + ":" + event.newTier();
+        boolean isNewPromotion = repository.saveActivityEvent(
+            event.userId(), AchievementMetric.CLAN_PROMOTED,
+            sourceId, event.occurredAt()
+        );
+
+        if (isNewPromotion) {
+            updateAchievementAndMissionProgress(event.userId(), AchievementMetric.CLAN_PROMOTED);
+        }
+
+        if ("DIAMOND".equalsIgnoreCase(event.newTier())) {
+            boolean isNewDiamondEvent = repository.saveActivityEvent(
+                event.userId(), AchievementMetric.CLAN_REACHED_DIAMOND,
+                sourceId, event.occurredAt()
+            );
+
+            if (isNewDiamondEvent) {
+                updateAchievementAndMissionProgress(event.userId(), AchievementMetric.CLAN_REACHED_DIAMOND);
+            }
+        }
+    }
+
+    @Override
+    @Transactional
     public void rotateDailyMissions() {
-        // Rotasi dilakukan oleh scheduler; logic seed di sini jika diperlukan
+        LocalDate today = LocalDate.now();
+        if (repository.hasActiveDailyMissionOn(today)) {
+            return;
+        }
+
+        DailyMission mission = new DailyMission(
+            UUID.randomUUID(),
+            "DAILY_QUIZ_" + today.format(DateTimeFormatter.BASIC_ISO_DATE),
+            "Kuis Harian",
+            "Selesaikan satu kuis hari ini.",
+            AchievementMetric.QUIZ_COMPLETED,
+            1,
+            DEFAULT_DAILY_MISSION_REWARD,
+            today,
+            today.plusDays(1),
+            Instant.now()
+        );
+
+        repository.saveDailyMission(mission);
     }
 
     // ─── Private Helpers ──────────────────────────────────────────────
@@ -225,7 +304,8 @@ public class AchievementServiceImpl implements AchievementService {
             int newCount = state.progressCount() + 1;
             repository.saveDailyMissionProgress(userId, mission.id(), newCount, null);
 
-            if (newCount == mission.targetCount()) {
+            if (state.progressCount() < mission.targetCount()
+                && newCount >= mission.targetCount()) {
                 rabbitTemplate.convertAndSend("yomu.daily.mission.completed", new DailyMissionCompletedEvent(
                     userId, mission.id(), mission.name(), Instant.now()
                 ));
@@ -245,7 +325,7 @@ public class AchievementServiceImpl implements AchievementService {
         return new AchievementProgressResponse(
             a.id(), a.code(), a.name(), a.description(),
             a.metric().name(), a.milestone(),
-            p.progressCount(), p.unlockedAt()
+            p.progressCount(), p.unlocked(), p.unlockedAt()
         );
     }
 
@@ -262,7 +342,42 @@ public class AchievementServiceImpl implements AchievementService {
         return new DailyMissionProgressResponse(
             m.id(), m.code(), m.name(), m.description(),
             m.metric().name(), m.targetCount(), m.rewardPoints(),
-            p.progressCount(), p.claimedAt()
+            p.progressCount(), p.completed(), p.claimed(), p.claimedAt()
         );
+    }
+
+    private AchievementMetric requireMetric(AchievementMetric metric) {
+        if (metric == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Metric wajib diisi");
+        }
+        return metric;
+    }
+
+    private String normalizeNullableText(String value) {
+        return value == null ? "" : value.trim();
+    }
+
+    private String resolveCode(String providedCode, String fallbackName) {
+        String rawCode = hasText(providedCode) ? providedCode : fallbackName;
+        if (!hasText(rawCode)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Kode wajib diisi");
+        }
+
+        String normalized = rawCode.trim()
+            .toUpperCase(Locale.ROOT)
+            .replaceAll("[^A-Z0-9]+", "_")
+            .replaceAll("^_+|_+$", "");
+
+        if (normalized.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Kode tidak valid");
+        }
+        return normalized;
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 }

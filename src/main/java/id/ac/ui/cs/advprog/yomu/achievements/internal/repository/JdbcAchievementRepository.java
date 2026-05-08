@@ -107,6 +107,27 @@ public class JdbcAchievementRepository implements AchievementRepository {
             AchievementMetric.READING_COMPLETED,
             10
         );
+        seedAchievement(
+            "ACTIVE_DISCUSSER",
+            "Aktif Berdiskusi",
+            "Membuat 5 komentar di forum.",
+            AchievementMetric.COMMENT_CREATED,
+            5
+        );
+        seedAchievement(
+            "FIRST_PROMOTION",
+            "First Promotion",
+            "Menjadi anggota clan yang promosi tier.",
+            AchievementMetric.CLAN_PROMOTED,
+            1
+        );
+        seedAchievement(
+            "DIAMOND_CLAN",
+            "Diamond Clan",
+            "Menjadi anggota clan yang mencapai tier Diamond.",
+            AchievementMetric.CLAN_REACHED_DIAMOND,
+            1
+        );
     }
 
     @Override

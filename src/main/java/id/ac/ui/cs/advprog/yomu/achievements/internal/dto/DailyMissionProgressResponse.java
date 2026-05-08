@@ -12,6 +12,8 @@ public record DailyMissionProgressResponse(
     int targetCount,
     int rewardPoints,
     int progress,
+    boolean completed,
+    boolean claimed,
     Instant claimedAt
 ) {
 }

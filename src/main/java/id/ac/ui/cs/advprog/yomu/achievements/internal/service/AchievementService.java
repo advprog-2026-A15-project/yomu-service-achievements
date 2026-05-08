@@ -10,6 +10,8 @@ import id.ac.ui.cs.advprog.yomu.achievements.internal.dto.DailyMissionResponse;
 import id.ac.ui.cs.advprog.yomu.shared.event.LeagueActivityEvent;
 import id.ac.ui.cs.advprog.yomu.shared.event.LearningCompletedEvent;
 import id.ac.ui.cs.advprog.yomu.shared.event.QuizCompletedEvent;
+import id.ac.ui.cs.advprog.yomu.shared.event.ClanPromotedEvent;
+import id.ac.ui.cs.advprog.yomu.shared.event.CommentCreatedEvent;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +33,10 @@ public interface AchievementService {
     void recordQuizCompleted(QuizCompletedEvent event);
 
     void recordLeagueActivity(LeagueActivityEvent event);
+
+    void recordCommentCreated(CommentCreatedEvent event);
+
+    void recordClanPromoted(ClanPromotedEvent event);
 
     void rotateDailyMissions();
 }
