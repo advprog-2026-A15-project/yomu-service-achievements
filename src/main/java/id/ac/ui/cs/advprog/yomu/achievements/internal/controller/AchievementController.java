@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -67,5 +68,15 @@ public class AchievementController {
         @RequestParam UUID userId
     ) {
         return achievementService.claimDailyMissionReward(missionId, userId);
+    }
+
+    @PutMapping("/{achievementId}/pin")
+    public ResponseEntity<Void> pinAchievement(
+        @PathVariable UUID achievementId,
+        @RequestParam UUID userId,
+        @RequestParam boolean pin
+    ) {
+        achievementService.pinAchievement(userId, achievementId, pin);
+        return ResponseEntity.ok().build();
     }
 }

@@ -4,6 +4,7 @@ import java.time.Instant;
 
 public record AchievementProgressState(
     int progressCount,
-    Instant unlockedAt
+    Instant unlockedAt,
+    boolean isPinned
 ) {
 }

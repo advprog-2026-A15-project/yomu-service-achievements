@@ -5,7 +5,8 @@ import java.time.Instant;
 public record AchievementProgress(
     Achievement achievement,
     int progressCount,
-    Instant unlockedAt
+    Instant unlockedAt,
+    boolean isPinned
 ) {
     public boolean unlocked() {
         return unlockedAt != null;
