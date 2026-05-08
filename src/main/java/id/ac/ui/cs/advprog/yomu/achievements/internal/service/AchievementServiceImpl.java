@@ -340,11 +340,7 @@ public class AchievementServiceImpl implements AchievementService {
         return new AchievementProgressResponse(
             a.id(), a.code(), a.name(), a.description(),
             a.metric().name(), a.milestone(),
-<<<<<<< HEAD
-            p.progressCount(), p.unlocked(), p.unlockedAt()
-=======
             p.progressCount(), p.unlockedAt(), p.isPinned()
->>>>>>> 7041e58ccda4e11d52ef656ca3bfcb0f79ef32cc
         );
     }
 
