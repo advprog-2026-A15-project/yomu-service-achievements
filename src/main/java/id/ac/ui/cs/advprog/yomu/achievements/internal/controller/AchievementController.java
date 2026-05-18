@@ -12,6 +12,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -44,8 +47,11 @@ public class AchievementController {
     }
 
     @GetMapping
-    public List<AchievementProgressResponse> listAchievements(@RequestParam UUID userId) {
-        return achievementService.listAchievementProgress(userId);
+    public List<AchievementProgressResponse> listAchievements(
+        @RequestParam(required = false) UUID userId,
+        Authentication authentication
+    ) {
+        return achievementService.listAchievementProgress(resolveTargetUserId(userId, authentication));
     }
 
     @PostMapping("/admin/daily-missions")
@@ -58,25 +64,54 @@ public class AchievementController {
     }
 
     @GetMapping("/daily-missions/active")
-    public List<DailyMissionProgressResponse> listActiveDailyMissions(@RequestParam UUID userId) {
-        return achievementService.listActiveDailyMissions(userId);
+    public List<DailyMissionProgressResponse> listActiveDailyMissions(
+        @RequestParam(required = false) UUID userId,
+        Authentication authentication
+    ) {
+        return achievementService.listActiveDailyMissions(resolveTargetUserId(userId, authentication));
     }
 
     @PostMapping("/daily-missions/{missionId}/claim")
     public ClaimRewardResponse claimDailyMissionReward(
         @PathVariable UUID missionId,
-        @RequestParam UUID userId
+        @RequestParam(required = false) UUID userId,
+        Authentication authentication
     ) {
-        return achievementService.claimDailyMissionReward(missionId, userId);
+        return achievementService.claimDailyMissionReward(missionId, resolveTargetUserId(userId, authentication));
     }
 
     @PutMapping("/{achievementId}/pin")
     public ResponseEntity<Void> pinAchievement(
         @PathVariable UUID achievementId,
-        @RequestParam UUID userId,
-        @RequestParam boolean pin
+        @RequestParam(required = false) UUID userId,
+        @RequestParam boolean pin,
+        Authentication authentication
     ) {
-        achievementService.pinAchievement(userId, achievementId, pin);
+        achievementService.pinAchievement(resolveTargetUserId(userId, authentication), achievementId, pin);
         return ResponseEntity.ok().build();
+    }
+
+    private UUID resolveTargetUserId(UUID requestedUserId, Authentication authentication) {
+        if (authentication == null || authentication.getCredentials() == null) {
+            if (requestedUserId != null) {
+                return requestedUserId;
+            }
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User tidak terautentikasi");
+        }
+
+        UUID authenticatedUserId = UUID.fromString(authentication.getCredentials().toString());
+        if (requestedUserId == null || requestedUserId.equals(authenticatedUserId)) {
+            return authenticatedUserId;
+        }
+        if (isAdmin(authentication)) {
+            return requestedUserId;
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User tidak dapat mengakses data akun lain");
+    }
+
+    private boolean isAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .anyMatch("ROLE_ADMIN"::equals);
     }
 }
