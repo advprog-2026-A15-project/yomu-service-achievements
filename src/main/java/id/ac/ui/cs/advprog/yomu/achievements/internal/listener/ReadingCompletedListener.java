@@ -1,11 +1,12 @@
 package id.ac.ui.cs.advprog.yomu.achievements.internal.listener;
 
 import id.ac.ui.cs.advprog.yomu.achievements.internal.service.AchievementService;
+import id.ac.ui.cs.advprog.yomu.shared.event.ClanPromotedEvent;
+import id.ac.ui.cs.advprog.yomu.shared.event.CommentCreatedEvent;
+import id.ac.ui.cs.advprog.yomu.shared.event.LeagueActivityEvent;
 import id.ac.ui.cs.advprog.yomu.shared.event.LearningCompletedEvent;
 import id.ac.ui.cs.advprog.yomu.shared.event.QuizCompletedEvent;
-import id.ac.ui.cs.advprog.yomu.shared.event.LeagueActivityEvent;
-import id.ac.ui.cs.advprog.yomu.shared.event.CommentCreatedEvent;
-import id.ac.ui.cs.advprog.yomu.shared.event.ClanPromotedEvent;
+
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;

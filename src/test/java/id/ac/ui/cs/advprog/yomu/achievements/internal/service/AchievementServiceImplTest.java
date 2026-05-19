@@ -73,7 +73,6 @@ class AchievementServiceImplTest {
 
         assertThat(progress.code()).isEqualTo("FIRST_READ");
         assertThat(progress.progress()).isEqualTo(1);
-        assertThat(progress.unlocked()).isTrue();
         assertThat(progress.unlockedAt()).isNotNull();
 
         assertThat(rabbitTemplate.publishedEvents)
@@ -210,12 +209,13 @@ class AchievementServiceImplTest {
                 .map(achievement -> {
                     AchievementProgressState state = achievementProgress.getOrDefault(
                         new ProgressKey(userId, achievement.id()),
-                        new AchievementProgressState(0, null)
+                        new AchievementProgressState(0, null, false)
                     );
                     return new AchievementProgress(
                         achievement,
                         state.progressCount(),
-                        state.unlockedAt()
+                        state.unlockedAt(),
+                        state.isPinned()
                     );
                 })
                 .toList();
@@ -238,8 +238,26 @@ class AchievementServiceImplTest {
         ) {
             achievementProgress.put(
                 new ProgressKey(userId, achievementId),
-                new AchievementProgressState(progressCount, unlockedAt)
+                new AchievementProgressState(
+                    progressCount,
+                    unlockedAt,
+                    findAchievementProgressState(userId, achievementId)
+                        .map(AchievementProgressState::isPinned)
+                        .orElse(false)
+                )
             );
+        }
+
+        @Override
+        public void pinAchievement(UUID userId, UUID achievementId, boolean pin) {
+            ProgressKey key = new ProgressKey(userId, achievementId);
+            AchievementProgressState state = achievementProgress.get(key);
+            if (state != null) {
+                achievementProgress.put(
+                    key,
+                    new AchievementProgressState(state.progressCount(), state.unlockedAt(), pin)
+                );
+            }
         }
 
         @Override
