@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.7
+
 FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /app
 COPY shared-lib ./shared-lib
@@ -6,14 +8,14 @@ COPY service-achievements ./service-achievements
 ARG CLEAN_GRADLE_CACHE=0
 
 # Build shared-lib
-RUN if [ "$CLEAN_GRADLE_CACHE" = "1" ]; then rm -rf /root/.gradle/caches /root/.gradle/wrapper/dists; fi && \
+RUN --mount=type=cache,target=/root/.gradle,sharing=locked if [ "$CLEAN_GRADLE_CACHE" = "1" ]; then rm -rf /root/.gradle/caches /root/.gradle/wrapper/dists; fi && \
     cd ./shared-lib && \
     sed -i 's/\r$//' ./gradlew && \
     chmod +x ./gradlew && \
     ./gradlew publishToMavenLocal --no-daemon
 
 # Build service
-RUN cd ./service-achievements && \
+RUN --mount=type=cache,target=/root/.gradle,sharing=locked cd ./service-achievements && \
     sed -i 's/\r$//' ./gradlew && \
     chmod +x ./gradlew && \
     ./gradlew bootJar --no-daemon
