@@ -4,6 +4,8 @@ import id.ac.ui.cs.advprog.yomu.achievements.internal.dto.*;
 import id.ac.ui.cs.advprog.yomu.achievements.internal.model.*;
 import id.ac.ui.cs.advprog.yomu.achievements.internal.repository.AchievementRepository;
 import id.ac.ui.cs.advprog.yomu.shared.event.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ import java.util.UUID;
  */
 @Service
 public class AchievementServiceImpl implements AchievementService {
+    private static final Logger logger = LoggerFactory.getLogger(AchievementServiceImpl.class);
     private static final int DEFAULT_DAILY_MISSION_REWARD = 10;
 
     private final AchievementRepository repository;
@@ -216,16 +219,21 @@ public class AchievementServiceImpl implements AchievementService {
     @Override
     @Transactional
     public void recordCommentCreated(CommentCreatedEvent event) {
-        UUID userId = UUID.fromString(event.userId());
-        boolean isNewEvent = repository.saveActivityEvent(
-            userId,
-            AchievementMetric.COMMENT_CREATED,
-            event.commentId(),
-            event.timestamp()
-        );
+        try {
+            UUID userId = UUID.fromString(event.userId());
+            boolean isNewEvent = repository.saveActivityEvent(
+                userId,
+                AchievementMetric.COMMENT_CREATED,
+                event.commentId(),
+                event.timestamp()
+            );
 
-        if (isNewEvent) {
-            updateAchievementAndMissionProgress(userId, AchievementMetric.COMMENT_CREATED);
+            if (isNewEvent) {
+                updateAchievementAndMissionProgress(userId, AchievementMetric.COMMENT_CREATED);
+            }
+        } catch (IllegalArgumentException e) {
+            logger.error("Failed to parse userId as UUID for CommentCreatedEvent: {}. Error: {}", event.userId(), e.getMessage());
+            // We catch it here to prevent RabbitMQ from retrying infinitely with invalid data
         }
     }
 
