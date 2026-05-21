@@ -14,6 +14,7 @@ public record DailyMissionProgressResponse(
     int progress,
     boolean completed,
     boolean claimed,
-    Instant claimedAt
+    Instant claimedAt,
+    java.time.LocalDate activeUntil
 ) {
 }

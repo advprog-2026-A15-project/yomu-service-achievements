@@ -47,4 +47,6 @@ public interface AchievementRepository {
     void saveDailyMissionProgress(UUID userId, UUID missionId, int progressCount, Instant claimedAt);
 
     boolean saveActivityEvent(UUID userId, AchievementMetric metric, String sourceId, Instant occurredAt);
+
+    int sumClaimedRewardPoints(UUID userId);
 }

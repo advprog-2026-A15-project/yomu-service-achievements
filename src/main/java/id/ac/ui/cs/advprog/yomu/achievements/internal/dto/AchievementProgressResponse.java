@@ -12,6 +12,7 @@ public record AchievementProgressResponse(
     int milestone,
     int progress,
     Instant unlockedAt,
-    boolean isPinned
+    boolean unlocked,
+    boolean pinned
 ) {
 }

@@ -80,6 +80,14 @@ public class AchievementController {
         return achievementService.claimDailyMissionReward(missionId, resolveTargetUserId(userId, authentication));
     }
 
+    @GetMapping("/total-points")
+    public int getTotalClaimedPoints(
+        @RequestParam(required = false) UUID userId,
+        Authentication authentication
+    ) {
+        return achievementService.getTotalClaimedPoints(resolveTargetUserId(userId, authentication));
+    }
+
     @PutMapping("/{achievementId}/pin")
     public ResponseEntity<Void> pinAchievement(
         @PathVariable UUID achievementId,

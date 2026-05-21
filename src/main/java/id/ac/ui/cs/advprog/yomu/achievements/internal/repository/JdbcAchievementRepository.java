@@ -421,6 +421,20 @@ public class JdbcAchievementRepository implements AchievementRepository {
         }
     }
 
+    @Override
+    public int sumClaimedRewardPoints(UUID userId) {
+        Integer total = jdbcTemplate.queryForObject("""
+            SELECT COALESCE(SUM(dm.reward_points), 0)
+            FROM daily_missions dm
+            JOIN user_daily_mission_progress p ON p.mission_id = dm.id
+            WHERE p.user_id = ? AND p.claimed_at IS NOT NULL
+            """,
+            Integer.class,
+            userId
+        );
+        return total != null ? total : 0;
+    }
+
     private void seedAchievement(
         String code,
         String name,

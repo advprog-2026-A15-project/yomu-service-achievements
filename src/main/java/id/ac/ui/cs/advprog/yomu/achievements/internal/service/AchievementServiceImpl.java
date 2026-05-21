@@ -286,6 +286,11 @@ public class AchievementServiceImpl implements AchievementService {
         repository.saveDailyMission(mission);
     }
 
+    @Override
+    public int getTotalClaimedPoints(UUID userId) {
+        return repository.sumClaimedRewardPoints(userId);
+    }
+
     // ─── Private Helpers ──────────────────────────────────────────────
 
     private void updateAchievementAndMissionProgress(UUID userId, AchievementMetric metric) {
@@ -348,7 +353,9 @@ public class AchievementServiceImpl implements AchievementService {
         return new AchievementProgressResponse(
             a.id(), a.code(), a.name(), a.description(),
             a.metric().name(), a.milestone(),
-            p.progressCount(), p.unlockedAt(), p.isPinned()
+            p.progressCount(), p.unlockedAt(),
+            p.unlockedAt() != null,
+            p.isPinned()
         );
     }
 
@@ -365,7 +372,8 @@ public class AchievementServiceImpl implements AchievementService {
         return new DailyMissionProgressResponse(
             m.id(), m.code(), m.name(), m.description(),
             m.metric().name(), m.targetCount(), m.rewardPoints(),
-            p.progressCount(), p.completed(), p.claimed(), p.claimedAt()
+            p.progressCount(), p.completed(), p.claimed(), p.claimedAt(),
+            m.activeUntil()
         );
     }
 

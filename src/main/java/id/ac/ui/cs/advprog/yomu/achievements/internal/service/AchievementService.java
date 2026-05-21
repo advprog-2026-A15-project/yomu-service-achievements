@@ -41,4 +41,6 @@ public interface AchievementService {
     void recordClanPromoted(ClanPromotedEvent event);
 
     void rotateDailyMissions();
+
+    int getTotalClaimedPoints(UUID userId);
 }
