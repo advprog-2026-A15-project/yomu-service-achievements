@@ -48,3 +48,6 @@ bin/
 *.swp
 *.bak
 *.tmp
+
+# Logs
+log/**
