@@ -28,6 +28,8 @@ public class AchievementsSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/achievements/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/achievements/admin").hasRole("ADMIN")
                 .anyRequest().authenticated()
