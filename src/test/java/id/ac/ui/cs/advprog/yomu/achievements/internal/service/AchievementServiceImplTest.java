@@ -14,6 +14,7 @@ import id.ac.ui.cs.advprog.yomu.achievements.internal.model.AchievementProgressS
 import id.ac.ui.cs.advprog.yomu.achievements.internal.model.DailyMission;
 import id.ac.ui.cs.advprog.yomu.achievements.internal.model.DailyMissionProgress;
 import id.ac.ui.cs.advprog.yomu.achievements.internal.model.DailyMissionProgressState;
+import id.ac.ui.cs.advprog.yomu.achievements.internal.monitoring.AchievementMetrics;
 import id.ac.ui.cs.advprog.yomu.achievements.internal.repository.AchievementRepository;
 import id.ac.ui.cs.advprog.yomu.shared.event.AchievementUnlockedEvent;
 import id.ac.ui.cs.advprog.yomu.shared.event.ClanPromotedEvent;
@@ -22,6 +23,7 @@ import id.ac.ui.cs.advprog.yomu.shared.event.DailyMissionCompletedEvent;
 import id.ac.ui.cs.advprog.yomu.shared.event.LeagueActivityEvent;
 import id.ac.ui.cs.advprog.yomu.shared.event.LearningCompletedEvent;
 import id.ac.ui.cs.advprog.yomu.shared.event.QuizCompletedEvent;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -47,6 +49,7 @@ class AchievementServiceImplTest {
 
     private InMemoryAchievementRepository repository;
     private CapturingRabbitTemplate rabbitTemplate;
+    private SimpleMeterRegistry meterRegistry;
     private AchievementServiceImpl service;
     private Achievement firstRead;
 
@@ -54,7 +57,8 @@ class AchievementServiceImplTest {
     void setUp() {
         repository = new InMemoryAchievementRepository();
         rabbitTemplate = new CapturingRabbitTemplate();
-        service = new AchievementServiceImpl(repository, rabbitTemplate);
+        meterRegistry = new SimpleMeterRegistry();
+        service = new AchievementServiceImpl(repository, rabbitTemplate, new AchievementMetrics(meterRegistry));
 
         firstRead = new Achievement(
             UUID.randomUUID(),
@@ -119,6 +123,112 @@ class AchievementServiceImplTest {
 
         assertThat(progress.progress()).isEqualTo(1);
         assertThat(rabbitTemplate.publishedEvents).hasSize(1);
+    }
+
+    @Test
+    void quizCompleted_recordsPrometheusMetrics() {
+        UUID userId = UUID.randomUUID();
+
+        service.recordQuizCompleted(new QuizCompletedEvent(
+            userId,
+            UUID.randomUUID(),
+            "quiz-1",
+            80,
+            5,
+            Instant.now()
+        ));
+
+        assertThat(counterValue(
+            AchievementMetrics.ACTIVITY_EVENT_COUNTER_METRIC,
+            "metric", AchievementMetric.QUIZ_COMPLETED.name(),
+            "outcome", "new"
+        )).isEqualTo(1.0);
+        assertThat(counterValue(
+            AchievementMetrics.UNLOCK_COUNTER_METRIC,
+            "metric", AchievementMetric.QUIZ_COMPLETED.name()
+        )).isEqualTo(1.0);
+        assertThat(counterValue(
+            AchievementMetrics.ACTION_COUNTER_METRIC,
+            "action", "record_quiz_completed",
+            "outcome", "success"
+        )).isEqualTo(1.0);
+        assertThat(timerCount(
+            AchievementMetrics.ACTION_TIMER_METRIC,
+            "action", "record_quiz_completed",
+            "outcome", "success"
+        )).isEqualTo(1);
+    }
+
+    @Test
+    void duplicateQuizCompleted_recordsDuplicateActivityMetricOnlyOnce() {
+        UUID userId = UUID.randomUUID();
+        UUID quizId = UUID.randomUUID();
+        QuizCompletedEvent event = new QuizCompletedEvent(
+            userId,
+            quizId,
+            "quiz-1",
+            80,
+            5,
+            Instant.now()
+        );
+
+        service.recordQuizCompleted(event);
+        service.recordQuizCompleted(event);
+
+        assertThat(counterValue(
+            AchievementMetrics.ACTIVITY_EVENT_COUNTER_METRIC,
+            "metric", AchievementMetric.QUIZ_COMPLETED.name(),
+            "outcome", "new"
+        )).isEqualTo(1.0);
+        assertThat(counterValue(
+            AchievementMetrics.ACTIVITY_EVENT_COUNTER_METRIC,
+            "metric", AchievementMetric.QUIZ_COMPLETED.name(),
+            "outcome", "duplicate"
+        )).isEqualTo(1.0);
+        assertThat(counterValue(
+            AchievementMetrics.UNLOCK_COUNTER_METRIC,
+            "metric", AchievementMetric.QUIZ_COMPLETED.name()
+        )).isEqualTo(1.0);
+    }
+
+    @Test
+    void invalidCommentCreated_recordsInvalidUserMetric() {
+        service.recordCommentCreated(new CommentCreatedEvent(
+            "not-a-valid-uuid",
+            "bacaan-1",
+            null,
+            "comment-1",
+            "hello",
+            Instant.now()
+        ));
+
+        assertThat(counterValue(
+            AchievementMetrics.ACTIVITY_EVENT_COUNTER_METRIC,
+            "metric", AchievementMetric.COMMENT_CREATED.name(),
+            "outcome", "invalid_user_id"
+        )).isEqualTo(1.0);
+        assertThat(counterValue(
+            AchievementMetrics.ACTION_COUNTER_METRIC,
+            "action", "record_comment_created",
+            "outcome", "success"
+        )).isEqualTo(1.0);
+    }
+
+    @Test
+    void failedClaimDailyMissionReward_recordsFailureMetric() {
+        assertThatThrownBy(() -> service.claimDailyMissionReward(UUID.randomUUID(), UUID.randomUUID()))
+            .isInstanceOf(ResponseStatusException.class);
+
+        assertThat(counterValue(
+            AchievementMetrics.ACTION_COUNTER_METRIC,
+            "action", "claim_daily_mission_reward",
+            "outcome", "failure"
+        )).isEqualTo(1.0);
+        assertThat(timerCount(
+            AchievementMetrics.ACTION_TIMER_METRIC,
+            "action", "claim_daily_mission_reward",
+            "outcome", "failure"
+        )).isEqualTo(1);
     }
 
     @Test
@@ -760,6 +870,18 @@ class AchievementServiceImplTest {
         service.claimDailyMissionReward(mission.id(), userId);
 
         assertThat(service.getTotalClaimedPoints(userId)).isEqualTo(30);
+    }
+
+    private double counterValue(String metricName, String... tags) {
+        return Optional.ofNullable(meterRegistry.find(metricName).tags(tags).counter())
+            .map(counter -> counter.count())
+            .orElse(0.0);
+    }
+
+    private long timerCount(String metricName, String... tags) {
+        return Optional.ofNullable(meterRegistry.find(metricName).tags(tags).timer())
+            .map(timer -> timer.count())
+            .orElse(0L);
     }
 
     private record PublishedEvent(String routingKey, Object message) {
