@@ -3,6 +3,7 @@ plugins {
     id("org.springframework.boot") version "4.0.5"
     id("io.spring.dependency-management") version "1.1.7"
     jacoco
+    id("org.sonarqube") version "5.1.0.4882"
 }
 
 group = "id.ac.ui.cs.advprog.yomu"
@@ -90,4 +91,14 @@ tasks.jacocoTestCoverageVerification {
 
 tasks.check {
     dependsOn(tasks.jacocoTestCoverageVerification)
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "advprog-2026-A15-project_yomu-service-achievements")
+        property("sonar.organization", "advprog-2026-a15-project")
+        property("sonar.host.url", System.getenv("SONAR_HOST_URL") ?: "https://sonarcloud.io")
+        property("sonar.token", System.getenv("SONAR_TOKEN") ?: "")
+        property("sonar.coverage.jacoco.xmlReportPaths", "${layout.buildDirectory.get()}/reports/jacoco/test/jacocoTestReport.xml")
+    }
 }
