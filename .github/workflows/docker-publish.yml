@@ -21,7 +21,7 @@ jobs:
       - name: Checkout shared-lib
         uses: actions/checkout@v4
         with:
-          repository: advprog-2026-A15-project/shared-lib
+          repository: advprog-2026-A15-project/yomu-shared-lib
           path: shared-lib
         continue-on-error: true
 
