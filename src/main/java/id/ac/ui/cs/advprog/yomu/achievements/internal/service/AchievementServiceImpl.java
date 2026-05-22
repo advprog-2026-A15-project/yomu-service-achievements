@@ -144,6 +144,9 @@ public class AchievementServiceImpl implements AchievementService {
         Instant now = Instant.now();
         repository.saveDailyMissionProgress(userId, missionId, state.progressCount(), now);
 
+        rabbitTemplate.convertAndSend("yomu.mission.reward.claimed",
+            new MissionRewardClaimedEvent(userId, missionId, mission.name(), mission.rewardPoints(), now));
+
         return new ClaimRewardResponse(
             missionId,
             mission.name(),
