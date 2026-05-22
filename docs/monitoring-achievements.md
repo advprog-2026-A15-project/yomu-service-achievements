@@ -76,3 +76,18 @@ increase(yomu_achievements_daily_mission_completions_total[1h])
   indicate event listener, repository, or mission rotation problems.
 - High p95 action latency points to repository queries or transaction work that
   should be profiled further.
+
+## SLI And SLA
+
+The following indicators are used for the Achievements service in staging.
+
+| Area | SLI | SLA target | PromQL |
+| :-- | :-- | :-- | :-- |
+| Availability | Percentage of successful Prometheus scrapes for `service-achievements:8083`. | `>= 99%` uptime during the evaluation window. | `avg_over_time(up{job="yomu-services",instance="service-achievements:8083"}[1h]) * 100` |
+| Request success | Percentage of non-5xx requests to achievement APIs. | `>= 99%` requests do not fail because of server errors. | `sum(rate(http_server_requests_seconds_count{instance="service-achievements:8083",uri=~"/api/achievements.*",status!~"5.."}[5m])) / sum(rate(http_server_requests_seconds_count{instance="service-achievements:8083",uri=~"/api/achievements.*"}[5m])) * 100` |
+| Action latency | p95 duration of service-level achievement actions. | `p95 < 500 ms` for normal staging traffic. | `histogram_quantile(0.95, sum(rate(yomu_achievements_action_duration_seconds_bucket{instance="service-achievements:8083"}[5m])) by (le, action))` |
+| Event processing health | Duplicate/invalid activity event ratio. | `< 5%` duplicate or invalid events over 1 hour. | `sum(increase(yomu_achievements_activity_events_total{instance="service-achievements:8083",outcome=~"duplicate|invalid_user_id"}[1h])) / sum(increase(yomu_achievements_activity_events_total{instance="service-achievements:8083"}[1h])) * 100` |
+
+The SLA targets are intentionally staging-oriented. They validate that the
+service is observable and healthy enough for evaluation, while leaving room for
+tighter production targets after real traffic baselines are available.
