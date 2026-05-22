@@ -1,8 +1,12 @@
 package id.ac.ui.cs.advprog.yomu.achievements.internal.service;
 
 import id.ac.ui.cs.advprog.yomu.achievements.internal.dto.AchievementProgressResponse;
+import id.ac.ui.cs.advprog.yomu.achievements.internal.dto.AchievementResponse;
 import id.ac.ui.cs.advprog.yomu.achievements.internal.dto.ClaimRewardResponse;
+import id.ac.ui.cs.advprog.yomu.achievements.internal.dto.CreateAchievementRequest;
+import id.ac.ui.cs.advprog.yomu.achievements.internal.dto.CreateDailyMissionRequest;
 import id.ac.ui.cs.advprog.yomu.achievements.internal.dto.DailyMissionProgressResponse;
+import id.ac.ui.cs.advprog.yomu.achievements.internal.dto.DailyMissionResponse;
 import id.ac.ui.cs.advprog.yomu.achievements.internal.model.Achievement;
 import id.ac.ui.cs.advprog.yomu.achievements.internal.model.AchievementMetric;
 import id.ac.ui.cs.advprog.yomu.achievements.internal.model.AchievementProgress;
@@ -559,6 +563,203 @@ class AchievementServiceImplTest {
             .orElseThrow();
 
         assertThat(progress.progress()).isEqualTo(1);
+    }
+
+    @Test
+    void createAchievement_success_persistsAndReturnsResponse() {
+        AchievementResponse response = service.createAchievement(new CreateAchievementRequest(
+            "BOOKWORM",
+            "Bookworm",
+            "Read ten articles",
+            AchievementMetric.READING_COMPLETED,
+            10
+        ));
+
+        assertThat(response.code()).isEqualTo("BOOKWORM");
+        assertThat(response.name()).isEqualTo("Bookworm");
+        assertThat(response.metric()).isEqualTo(AchievementMetric.READING_COMPLETED.name());
+        assertThat(repository.existsByAchievementCode("BOOKWORM")).isTrue();
+    }
+
+    @Test
+    void createAchievement_duplicateCode_throws409() {
+        service.createAchievement(new CreateAchievementRequest(
+            null,
+            "Duplicate",
+            null,
+            AchievementMetric.QUIZ_COMPLETED,
+            1
+        ));
+
+        assertThatThrownBy(() -> service.createAchievement(new CreateAchievementRequest(
+            "DUPLICATE",
+            "Other",
+            null,
+            AchievementMetric.QUIZ_COMPLETED,
+            2
+        )))
+            .isInstanceOf(ResponseStatusException.class)
+            .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
+                .isEqualTo(HttpStatus.CONFLICT));
+    }
+
+    @Test
+    void createAchievement_nullMetric_throws400() {
+        assertThatThrownBy(() -> service.createAchievement(new CreateAchievementRequest(
+            "NO_METRIC",
+            "No Metric",
+            null,
+            null,
+            1
+        )))
+            .isInstanceOf(ResponseStatusException.class)
+            .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
+                .isEqualTo(HttpStatus.BAD_REQUEST));
+    }
+
+    @Test
+    void createDailyMission_success_persistsMission() {
+        LocalDate from = LocalDate.now();
+        DailyMissionResponse response = service.createDailyMission(new CreateDailyMissionRequest(
+            "WEEKLY_QUIZ",
+            "Weekly Quiz",
+            "Finish three quizzes",
+            AchievementMetric.QUIZ_COMPLETED,
+            3,
+            50,
+            from,
+            from.plusDays(7)
+        ));
+
+        assertThat(response.code()).isEqualTo("WEEKLY_QUIZ");
+        assertThat(response.targetCount()).isEqualTo(3);
+        assertThat(response.rewardPoints()).isEqualTo(50);
+        assertThat(repository.existsByDailyMissionCode("WEEKLY_QUIZ")).isTrue();
+    }
+
+    @Test
+    void createDailyMission_invalidDateRange_throws400() {
+        LocalDate from = LocalDate.now();
+        assertThatThrownBy(() -> service.createDailyMission(new CreateDailyMissionRequest(
+            "BAD_DATES",
+            "Bad Dates",
+            null,
+            AchievementMetric.QUIZ_COMPLETED,
+            1,
+            10,
+            from,
+            from
+        )))
+            .isInstanceOf(ResponseStatusException.class)
+            .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
+                .isEqualTo(HttpStatus.BAD_REQUEST));
+    }
+
+    @Test
+    void createDailyMission_duplicateCode_throws409() {
+        LocalDate from = LocalDate.now();
+        service.createDailyMission(new CreateDailyMissionRequest(
+            null,
+            "Daily One",
+            null,
+            AchievementMetric.QUIZ_COMPLETED,
+            1,
+            5,
+            from,
+            from.plusDays(1)
+        ));
+
+        assertThatThrownBy(() -> service.createDailyMission(new CreateDailyMissionRequest(
+            "DAILY_ONE",
+            "Daily Two",
+            null,
+            AchievementMetric.QUIZ_COMPLETED,
+            1,
+            5,
+            from,
+            from.plusDays(1)
+        )))
+            .isInstanceOf(ResponseStatusException.class)
+            .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
+                .isEqualTo(HttpStatus.CONFLICT));
+    }
+
+    @Test
+    void listAchievementProgress_returnsAllActiveAchievements() {
+        UUID userId = UUID.randomUUID();
+
+        List<AchievementProgressResponse> progress = service.listAchievementProgress(userId);
+
+        assertThat(progress).extracting(AchievementProgressResponse::code)
+            .contains("FIRST_READ");
+    }
+
+    @Test
+    void claimDailyMission_missionNotFound_throws404() {
+        assertThatThrownBy(() -> service.claimDailyMissionReward(UUID.randomUUID(), UUID.randomUUID()))
+            .isInstanceOf(ResponseStatusException.class)
+            .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
+                .isEqualTo(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    void pinAchievement_success_whenUnlocked() {
+        UUID userId = UUID.randomUUID();
+        service.recordQuizCompleted(new QuizCompletedEvent(
+            userId, UUID.randomUUID(), "quiz-1", 5, 5, Instant.now()));
+
+        service.pinAchievement(userId, firstRead.id(), true);
+
+        AchievementProgressResponse progress = service.listAchievementProgress(userId).stream()
+            .filter(p -> "FIRST_READ".equals(p.code()))
+            .findFirst()
+            .orElseThrow();
+
+        assertThat(progress.pinned()).isTrue();
+    }
+
+    @Test
+    void pinAchievement_notUnlocked_throws400() {
+        UUID userId = UUID.randomUUID();
+        repository.saveAchievementProgress(userId, firstRead.id(), 1, null);
+
+        assertThatThrownBy(() -> service.pinAchievement(userId, firstRead.id(), true))
+            .isInstanceOf(ResponseStatusException.class)
+            .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
+                .isEqualTo(HttpStatus.BAD_REQUEST));
+    }
+
+    @Test
+    void pinAchievement_progressNotFound_throws404() {
+        UUID userId = UUID.randomUUID();
+
+        assertThatThrownBy(() -> service.pinAchievement(userId, UUID.randomUUID(), true))
+            .isInstanceOf(ResponseStatusException.class)
+            .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
+                .isEqualTo(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    void getTotalClaimedPoints_sumsClaimedMissionRewards() {
+        UUID userId = UUID.randomUUID();
+        DailyMission mission = new DailyMission(
+            UUID.randomUUID(),
+            "DAILY_QUIZ",
+            "Kuis Harian",
+            "Selesaikan satu kuis.",
+            AchievementMetric.QUIZ_COMPLETED,
+            1,
+            30,
+            LocalDate.now(),
+            LocalDate.now().plusDays(1),
+            Instant.now()
+        );
+        repository.saveDailyMission(mission);
+        service.recordQuizCompleted(new QuizCompletedEvent(
+            userId, UUID.randomUUID(), "quiz-1", 5, 5, Instant.now()));
+        service.claimDailyMissionReward(mission.id(), userId);
+
+        assertThat(service.getTotalClaimedPoints(userId)).isEqualTo(30);
     }
 
     private record PublishedEvent(String routingKey, Object message) {
