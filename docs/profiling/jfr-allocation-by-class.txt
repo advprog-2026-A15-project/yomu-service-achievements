@@ -1,0 +1,30 @@
+
+                                                  Allocation by Class
+
+Object Type                                                                                         Allocation Pressure
+--------------------------------------------------------------------------------------------------- -------------------
+byte[]                                                                                                           61.75%
+java.lang.String                                                                                                  7.24%
+java.net.URL                                                                                                      5.53%
+org.springframework.boot.loader.net.protocol.jar.JarFileUrlKey                                                    2.32%
+java.lang.Object[]                                                                                                1.87%
+java.lang.Class[]                                                                                                 1.85%
+java.nio.HeapByteBuffer                                                                                           0.94%
+int[]                                                                                                             0.86%
+java.util.HashMap$Node[]                                                                                          0.86%
+java.util.concurrent.ConcurrentHashMap$Node                                                                       0.79%
+jdk.internal.org.objectweb.asm.SymbolTable$Entry                                                                  0.79%
+long[]                                                                                                            0.79%
+java.time.Instant                                                                                                 0.55%
+java.util.ArrayList                                                                                               0.54%
+java.lang.StringBuilder                                                                                           0.49%
+short[]                                                                                                           0.41%
+org.springframework.core.MethodIntrospector$$Lambda+0x00000184ae436c20.116892325                                  0.39%
+org.springframework.core.annotation.TypeMappedAnnotations                                                         0.33%
+org.springframework.core.ResolvableType                                                                           0.31%
+java.util.HashMap                                                                                                 0.30%
+java.util.ArrayList$Itr                                                                                           0.30%
+java.util.concurrent.ConcurrentHashMap$Node[]                                                                     0.27%
+java.util.LinkedHashMap$Entry                                                                                     0.25%
+java.lang.reflect.Method                                                                                          0.24%
+org.springframework.boot.loader.net.protocol.nested.NestedUrlConnection                                           0.24%

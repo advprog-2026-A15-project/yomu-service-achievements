@@ -2,6 +2,7 @@ package id.ac.ui.cs.advprog.yomu.achievements.internal.service;
 
 import id.ac.ui.cs.advprog.yomu.achievements.internal.dto.*;
 import id.ac.ui.cs.advprog.yomu.achievements.internal.model.*;
+import id.ac.ui.cs.advprog.yomu.achievements.internal.monitoring.AchievementMetrics;
 import id.ac.ui.cs.advprog.yomu.achievements.internal.repository.AchievementRepository;
 import id.ac.ui.cs.advprog.yomu.shared.event.*;
 import org.slf4j.Logger;
@@ -32,266 +33,320 @@ public class AchievementServiceImpl implements AchievementService {
 
     private final AchievementRepository repository;
     private final RabbitTemplate rabbitTemplate;
+    private final AchievementMetrics metrics;
 
     public AchievementServiceImpl(
             AchievementRepository repository,
-            RabbitTemplate rabbitTemplate) {
+            RabbitTemplate rabbitTemplate,
+            AchievementMetrics metrics) {
         this.repository = repository;
         this.rabbitTemplate = rabbitTemplate;
+        this.metrics = metrics;
     }
 
     @Override
     @Transactional
     public AchievementResponse createAchievement(CreateAchievementRequest request) {
-        String code = resolveCode(request.code(), request.name());
-        AchievementMetric metric = requireMetric(request.metric());
-        String description = normalizeNullableText(request.description());
+        return metrics.recordAction("create_achievement", () -> {
+            String code = resolveCode(request.code(), request.name());
+            AchievementMetric metric = requireMetric(request.metric());
+            String description = normalizeNullableText(request.description());
 
-        if (repository.existsByAchievementCode(code)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                "Achievement dengan kode '" + code + "' sudah ada");
-        }
+            if (repository.existsByAchievementCode(code)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Achievement dengan kode '" + code + "' sudah ada");
+            }
 
-        Achievement achievement = new Achievement(
-            UUID.randomUUID(),
-            code,
-            request.name().trim(),
-            description,
-            metric,
-            request.milestone(),
-            true,
-            Instant.now()
-        );
+            Achievement achievement = new Achievement(
+                UUID.randomUUID(),
+                code,
+                request.name().trim(),
+                description,
+                metric,
+                request.milestone(),
+                true,
+                Instant.now()
+            );
 
-        repository.saveAchievement(achievement);
-        return toResponse(achievement);
+            repository.saveAchievement(achievement);
+            return toResponse(achievement);
+        });
     }
 
     @Override
     public List<AchievementProgressResponse> listAchievementProgress(UUID userId) {
-        return repository.findAchievementProgressForUser(userId).stream()
-            .map(this::toProgressResponse)
-            .toList();
+        return metrics.recordAction("list_achievement_progress", () ->
+            repository.findAchievementProgressForUser(userId).stream()
+                .map(this::toProgressResponse)
+                .toList()
+        );
     }
 
     @Override
     @Transactional
     public DailyMissionResponse createDailyMission(CreateDailyMissionRequest request) {
-        String code = resolveCode(request.code(), request.name());
-        AchievementMetric metric = requireMetric(request.metric());
-        String description = normalizeNullableText(request.description());
-        int rewardPoints = request.rewardPoints() == null ? 0 : request.rewardPoints();
-        LocalDate activeFrom = request.activeFrom() != null ? request.activeFrom() : LocalDate.now();
-        LocalDate activeUntil = request.activeUntil() != null ? request.activeUntil() : activeFrom.plusDays(1);
+        return metrics.recordAction("create_daily_mission", () -> {
+            String code = resolveCode(request.code(), request.name());
+            AchievementMetric metric = requireMetric(request.metric());
+            String description = normalizeNullableText(request.description());
+            int rewardPoints = request.rewardPoints() == null ? 0 : request.rewardPoints();
+            LocalDate activeFrom = request.activeFrom() != null ? request.activeFrom() : LocalDate.now();
+            LocalDate activeUntil = request.activeUntil() != null ? request.activeUntil() : activeFrom.plusDays(1);
 
-        if (!activeUntil.isAfter(activeFrom)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                "Tanggal selesai daily mission harus setelah tanggal mulai");
-        }
+            if (!activeUntil.isAfter(activeFrom)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Tanggal selesai daily mission harus setelah tanggal mulai");
+            }
 
-        if (repository.existsByDailyMissionCode(code)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                "Daily mission dengan kode '" + code + "' sudah ada");
-        }
+            if (repository.existsByDailyMissionCode(code)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Daily mission dengan kode '" + code + "' sudah ada");
+            }
 
-        DailyMission mission = new DailyMission(
-            UUID.randomUUID(),
-            code,
-            request.name().trim(),
-            description,
-            metric,
-            request.targetCount(),
-            rewardPoints,
-            activeFrom,
-            activeUntil,
-            Instant.now()
-        );
+            DailyMission mission = new DailyMission(
+                UUID.randomUUID(),
+                code,
+                request.name().trim(),
+                description,
+                metric,
+                request.targetCount(),
+                rewardPoints,
+                activeFrom,
+                activeUntil,
+                Instant.now()
+            );
 
-        repository.saveDailyMission(mission);
-        return toMissionResponse(mission);
+            repository.saveDailyMission(mission);
+            return toMissionResponse(mission);
+        });
     }
 
     @Override
     public List<DailyMissionProgressResponse> listActiveDailyMissions(UUID userId) {
-        LocalDate today = LocalDate.now();
-        return repository.findActiveDailyMissionProgressForUser(userId, today).stream()
-            .map(this::toMissionProgressResponse)
-            .toList();
+        return metrics.recordAction("list_active_daily_missions", () -> {
+            LocalDate today = LocalDate.now();
+            return repository.findActiveDailyMissionProgressForUser(userId, today).stream()
+                .map(this::toMissionProgressResponse)
+                .toList();
+        });
     }
 
     @Override
     @Transactional
     public ClaimRewardResponse claimDailyMissionReward(UUID missionId, UUID userId) {
-        DailyMission mission = repository.findDailyMissionById(missionId)
-            .orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "Daily mission tidak ditemukan"));
+        return metrics.recordAction("claim_daily_mission_reward", () -> {
+            DailyMission mission = repository.findDailyMissionById(missionId)
+                .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Daily mission tidak ditemukan"));
 
-        DailyMissionProgressState state = repository
-            .findDailyMissionProgressState(userId, missionId)
-            .orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.BAD_REQUEST, "Belum ada progres untuk misi ini"));
+            DailyMissionProgressState state = repository
+                .findDailyMissionProgressState(userId, missionId)
+                .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Belum ada progres untuk misi ini"));
 
-        if (state.claimedAt() != null) {
-            throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST, "Reward sudah diklaim");
-        }
+            if (state.claimedAt() != null) {
+                throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Reward sudah diklaim");
+            }
 
-        if (state.progressCount() < mission.targetCount()) {
-            throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST, "Misi belum selesai");
-        }
+            if (state.progressCount() < mission.targetCount()) {
+                throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Misi belum selesai");
+            }
 
-        Instant now = Instant.now();
-        repository.saveDailyMissionProgress(userId, missionId, state.progressCount(), now);
+            Instant now = Instant.now();
+            repository.saveDailyMissionProgress(userId, missionId, state.progressCount(), now);
 
-        rabbitTemplate.convertAndSend("yomu.mission.reward.claimed",
-            new MissionRewardClaimedEvent(userId, missionId, mission.name(), mission.rewardPoints(), now));
+            rabbitTemplate.convertAndSend("yomu.mission.reward.claimed",
+                new MissionRewardClaimedEvent(userId, missionId, mission.name(), mission.rewardPoints(), now));
 
-        return new ClaimRewardResponse(
-            missionId,
-            mission.name(),
-            mission.rewardPoints(),
-            true,
-            now
-        );
+            return new ClaimRewardResponse(
+                missionId,
+                mission.name(),
+                mission.rewardPoints(),
+                true,
+                now
+            );
+        });
     }
 
     @Override
     @Transactional
     public void pinAchievement(UUID userId, UUID achievementId, boolean pin) {
-        AchievementProgressState state = repository.findAchievementProgressState(userId, achievementId)
-            .orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "Progres achievement tidak ditemukan"));
+        metrics.recordAction("pin_achievement", () -> {
+            AchievementProgressState state = repository.findAchievementProgressState(userId, achievementId)
+                .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Progres achievement tidak ditemukan"));
 
-        if (state.unlockedAt() == null) {
-            throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST, "Hanya achievement yang sudah terbuka yang dapat dipajang");
-        }
+            if (state.unlockedAt() == null) {
+                throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Hanya achievement yang sudah terbuka yang dapat dipajang");
+            }
 
-        repository.pinAchievement(userId, achievementId, pin);
+            repository.pinAchievement(userId, achievementId, pin);
+        });
     }
 
     @Override
     @Transactional
     public void recordReadingCompleted(LearningCompletedEvent event) {
-        String sourceId = event.bacaanId().toString();
-        boolean isNewEvent = repository.saveActivityEvent(
-            event.userId(), AchievementMetric.READING_COMPLETED,
-            sourceId, event.occurredAt()
-        );
-
-        if (isNewEvent) {
-            updateAchievementAndMissionProgress(
-                event.userId(), AchievementMetric.READING_COMPLETED
+        metrics.recordAction("record_reading_completed", () -> {
+            String sourceId = event.bacaanId().toString();
+            boolean isNewEvent = repository.saveActivityEvent(
+                event.userId(), AchievementMetric.READING_COMPLETED,
+                sourceId, event.occurredAt()
             );
-        }
+            metrics.recordActivityEvent(
+                AchievementMetric.READING_COMPLETED,
+                activityOutcome(isNewEvent)
+            );
+
+            if (isNewEvent) {
+                updateAchievementAndMissionProgress(
+                    event.userId(), AchievementMetric.READING_COMPLETED
+                );
+            }
+        });
     }
 
     @Override
     @Transactional
     public void recordQuizCompleted(QuizCompletedEvent event) {
-        String sourceId = event.quizId().toString();
-        boolean isNewEvent = repository.saveActivityEvent(
-            event.userId(), AchievementMetric.QUIZ_COMPLETED,
-            sourceId, event.occurredAt()
-        );
-
-        if (isNewEvent) {
-            updateAchievementAndMissionProgress(
-                event.userId(), AchievementMetric.QUIZ_COMPLETED
+        metrics.recordAction("record_quiz_completed", () -> {
+            String sourceId = event.quizId().toString();
+            boolean isNewEvent = repository.saveActivityEvent(
+                event.userId(), AchievementMetric.QUIZ_COMPLETED,
+                sourceId, event.occurredAt()
             );
-        }
+            metrics.recordActivityEvent(
+                AchievementMetric.QUIZ_COMPLETED,
+                activityOutcome(isNewEvent)
+            );
+
+            if (isNewEvent) {
+                updateAchievementAndMissionProgress(
+                    event.userId(), AchievementMetric.QUIZ_COMPLETED
+                );
+            }
+        });
     }
 
     @Override
     @Transactional
     public void recordLeagueActivity(LeagueActivityEvent event) {
-        String sourceId = event.activityId().toString();
-        boolean isNewEvent = repository.saveActivityEvent(
-            event.userId(), AchievementMetric.LEAGUE_ACTIVITY,
-            sourceId, event.occurredAt()
-        );
-
-        if (isNewEvent) {
-            updateAchievementAndMissionProgress(
-                event.userId(), AchievementMetric.LEAGUE_ACTIVITY
+        metrics.recordAction("record_league_activity", () -> {
+            String sourceId = event.activityId().toString();
+            boolean isNewEvent = repository.saveActivityEvent(
+                event.userId(), AchievementMetric.LEAGUE_ACTIVITY,
+                sourceId, event.occurredAt()
             );
-        }
+            metrics.recordActivityEvent(
+                AchievementMetric.LEAGUE_ACTIVITY,
+                activityOutcome(isNewEvent)
+            );
+
+            if (isNewEvent) {
+                updateAchievementAndMissionProgress(
+                    event.userId(), AchievementMetric.LEAGUE_ACTIVITY
+                );
+            }
+        });
     }
 
     @Override
     @Transactional
     public void recordCommentCreated(CommentCreatedEvent event) {
-        try {
-            UUID userId = UUID.fromString(event.userId());
-            boolean isNewEvent = repository.saveActivityEvent(
-                userId,
-                AchievementMetric.COMMENT_CREATED,
-                event.commentId(),
-                event.timestamp()
-            );
+        metrics.recordAction("record_comment_created", () -> {
+            try {
+                UUID userId = UUID.fromString(event.userId());
+                boolean isNewEvent = repository.saveActivityEvent(
+                    userId,
+                    AchievementMetric.COMMENT_CREATED,
+                    event.commentId(),
+                    event.timestamp()
+                );
+                metrics.recordActivityEvent(
+                    AchievementMetric.COMMENT_CREATED,
+                    activityOutcome(isNewEvent)
+                );
 
-            if (isNewEvent) {
-                updateAchievementAndMissionProgress(userId, AchievementMetric.COMMENT_CREATED);
+                if (isNewEvent) {
+                    updateAchievementAndMissionProgress(userId, AchievementMetric.COMMENT_CREATED);
+                }
+            } catch (IllegalArgumentException e) {
+                metrics.recordActivityEvent(AchievementMetric.COMMENT_CREATED, "invalid_user_id");
+                logger.error("Failed to parse userId as UUID for CommentCreatedEvent: {}. Error: {}", event.userId(), e.getMessage());
+                // We catch it here to prevent RabbitMQ from retrying infinitely with invalid data
             }
-        } catch (IllegalArgumentException e) {
-            logger.error("Failed to parse userId as UUID for CommentCreatedEvent: {}. Error: {}", event.userId(), e.getMessage());
-            // We catch it here to prevent RabbitMQ from retrying infinitely with invalid data
-        }
+        });
     }
 
     @Override
     @Transactional
     public void recordClanPromoted(ClanPromotedEvent event) {
-        String sourceId = event.seasonId() + ":" + event.clanId() + ":" + event.userId() + ":" + event.newTier();
-        boolean isNewPromotion = repository.saveActivityEvent(
-            event.userId(), AchievementMetric.CLAN_PROMOTED,
-            sourceId, event.occurredAt()
-        );
-
-        if (isNewPromotion) {
-            updateAchievementAndMissionProgress(event.userId(), AchievementMetric.CLAN_PROMOTED);
-        }
-
-        if ("DIAMOND".equalsIgnoreCase(event.newTier())) {
-            boolean isNewDiamondEvent = repository.saveActivityEvent(
-                event.userId(), AchievementMetric.CLAN_REACHED_DIAMOND,
+        metrics.recordAction("record_clan_promoted", () -> {
+            String sourceId = event.seasonId() + ":" + event.clanId() + ":" + event.userId() + ":" + event.newTier();
+            boolean isNewPromotion = repository.saveActivityEvent(
+                event.userId(), AchievementMetric.CLAN_PROMOTED,
                 sourceId, event.occurredAt()
             );
+            metrics.recordActivityEvent(
+                AchievementMetric.CLAN_PROMOTED,
+                activityOutcome(isNewPromotion)
+            );
 
-            if (isNewDiamondEvent) {
-                updateAchievementAndMissionProgress(event.userId(), AchievementMetric.CLAN_REACHED_DIAMOND);
+            if (isNewPromotion) {
+                updateAchievementAndMissionProgress(event.userId(), AchievementMetric.CLAN_PROMOTED);
             }
-        }
+
+            if ("DIAMOND".equalsIgnoreCase(event.newTier())) {
+                boolean isNewDiamondEvent = repository.saveActivityEvent(
+                    event.userId(), AchievementMetric.CLAN_REACHED_DIAMOND,
+                    sourceId, event.occurredAt()
+                );
+                metrics.recordActivityEvent(
+                    AchievementMetric.CLAN_REACHED_DIAMOND,
+                    activityOutcome(isNewDiamondEvent)
+                );
+
+                if (isNewDiamondEvent) {
+                    updateAchievementAndMissionProgress(event.userId(), AchievementMetric.CLAN_REACHED_DIAMOND);
+                }
+            }
+        });
     }
 
     @Override
     @Transactional
     public void rotateDailyMissions() {
-        LocalDate today = LocalDate.now();
-        if (repository.hasActiveDailyMissionOn(today)) {
-            return;
-        }
+        metrics.recordAction("rotate_daily_missions", () -> {
+            LocalDate today = LocalDate.now();
+            if (repository.hasActiveDailyMissionOn(today)) {
+                return;
+            }
 
-        DailyMission mission = new DailyMission(
-            UUID.randomUUID(),
-            "DAILY_QUIZ_" + today.format(DateTimeFormatter.BASIC_ISO_DATE),
-            "Kuis Harian",
-            "Selesaikan satu kuis hari ini.",
-            AchievementMetric.QUIZ_COMPLETED,
-            1,
-            DEFAULT_DAILY_MISSION_REWARD,
-            today,
-            today.plusDays(1),
-            Instant.now()
-        );
+            DailyMission mission = new DailyMission(
+                UUID.randomUUID(),
+                "DAILY_QUIZ_" + today.format(DateTimeFormatter.BASIC_ISO_DATE),
+                "Kuis Harian",
+                "Selesaikan satu kuis hari ini.",
+                AchievementMetric.QUIZ_COMPLETED,
+                1,
+                DEFAULT_DAILY_MISSION_REWARD,
+                today,
+                today.plusDays(1),
+                Instant.now()
+            );
 
-        repository.saveDailyMission(mission);
+            repository.saveDailyMission(mission);
+        });
     }
 
     @Override
     public int getTotalClaimedPoints(UUID userId) {
-        return repository.sumClaimedRewardPoints(userId);
+        return metrics.recordAction("get_total_claimed_points", () ->
+            repository.sumClaimedRewardPoints(userId)
+        );
     }
 
     // ─── Private Helpers ──────────────────────────────────────────────
@@ -314,6 +369,7 @@ public class AchievementServiceImpl implements AchievementService {
             repository.saveAchievementProgress(userId, achievement.id(), newCount, unlockedAt);
 
             if (unlockedAt != null) {
+                metrics.recordAchievementUnlocked(metric);
                 rabbitTemplate.convertAndSend("yomu.achievement.unlocked", new AchievementUnlockedEvent(
                     userId, achievement.code(), achievement.name(), unlockedAt
                 ));
@@ -337,11 +393,16 @@ public class AchievementServiceImpl implements AchievementService {
 
             if (state.progressCount() < mission.targetCount()
                 && newCount >= mission.targetCount()) {
+                metrics.recordDailyMissionCompleted(metric);
                 rabbitTemplate.convertAndSend("yomu.daily.mission.completed", new DailyMissionCompletedEvent(
                     userId, mission.id(), mission.name(), Instant.now()
                 ));
             }
         }
+    }
+
+    private String activityOutcome(boolean isNewEvent) {
+        return isNewEvent ? "new" : "duplicate";
     }
 
     private AchievementResponse toResponse(Achievement a) {

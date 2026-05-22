@@ -1,0 +1,30 @@
+
+                                          Java Methods that Executes the Most
+
+Method                                                                                                  Samples Percent
+------------------------------------------------------------------------------------------------------- ------- -------
+java.net.URL.<init>(URL, String, URLStreamHandler)                                                           12   5.43%
+sun.net.www.ParseUtil.firstEncodeIndex(String)                                                                8   3.62%
+java.util.concurrent.ConcurrentHashMap.get(Object)                                                            7   3.17%
+java.util.Arrays.binarySearch0(int[], int, int, int)                                                          6   2.71%
+java.lang.StringLatin1.hashCode(byte[])                                                                       5   2.26%
+java.lang.String.hashCode()                                                                                   5   2.26%
+jdk.internal.util.ArraysSupport.mismatch(byte[], int, byte[], int, int)                                       5   2.26%
+org.springframework.boot.loader.net.protocol.jar.Handler.indexOfSeparator(String, int, int)                   4   1.81%
+org.springframework.boot.loader.jar.NestedJarFile.getVersionedContentEntry(String)                            3   1.36%
+org.springframework.boot.loader.zip.ZipContent$Loader.loadContent(...)                                        3   1.36%
+java.lang.StringConcatHelper.simpleConcat(Object, Object)                                                     3   1.36%
+java.lang.StringLatin1.regionMatchesCI(byte[], int, byte[], int, int)                                         3   1.36%
+org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.predictBeanType(...)             3   1.36%
+java.util.ComparableTimSort.binarySort(Object[], int, int, int)                                               2   0.90%
+jdk.jfr.internal.PlatformRecorder.periodicTask()                                                              2   0.90%
+org.h2.command.ParserBase.initialize(String, ArrayList, boolean)                                              2   0.90%
+org.springframework.boot.loader.zip.ZipString.hash(ByteBuffer, DataBlock, long, int, boolean)                 2   0.90%
+java.util.HashMap.getNode(Object)                                                                             2   0.90%
+java.lang.invoke.Invokers$Holder.linkToTargetMethod(Object, Object)                                           2   0.90%
+org.springframework.beans.factory.support.AbstractBeanFactory.isTypeMatch(...)                                2   0.90%
+java.lang.String.equals(Object)                                                                               2   0.90%
+org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(...)                      2   0.90%
+java.util.concurrent.ConcurrentHashMap.transfer(ConcurrentHashMap$Node[], ConcurrentHashMap$Node[])           2   0.90%
+jdk.internal.org.objectweb.asm.MethodWriter.visitFieldInsn(int, String, String, String)                       1   0.45%
+java.lang.reflect.Executable.getDeclaredAnnotations()                                                         1   0.45%

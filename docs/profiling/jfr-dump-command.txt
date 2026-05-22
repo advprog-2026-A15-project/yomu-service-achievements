@@ -1,0 +1,4 @@
+28236:
+Dumped recording "achievements-profile", 3.1 MB written to:
+
+C:\Users\indra\Downloads\yomu-app_rev4\yomu-app\service-achievements\docs\profiling\achievements-runtime.jfr

@@ -1,0 +1,836 @@
+# HELP application_ready_time_seconds Time taken for the application to be ready to service requests
+# TYPE application_ready_time_seconds gauge
+# HELP application_started_time_seconds Time taken to start the application
+# TYPE application_started_time_seconds gauge
+# HELP disk_free_bytes Usable space for path
+# TYPE disk_free_bytes gauge
+# HELP disk_total_bytes Total space for path
+# TYPE disk_total_bytes gauge
+# HELP executor_active_threads The approximate number of threads that are actively executing tasks
+# TYPE executor_active_threads gauge
+# HELP executor_completed_tasks_total The approximate total number of tasks that have completed execution
+# TYPE executor_completed_tasks_total counter
+# HELP executor_pool_core_threads The core number of threads for the pool
+# TYPE executor_pool_core_threads gauge
+# HELP executor_pool_max_threads The maximum allowed number of threads in the pool
+# TYPE executor_pool_max_threads gauge
+# HELP executor_pool_size_threads The current number of threads in the pool
+# TYPE executor_pool_size_threads gauge
+# HELP executor_queue_remaining_tasks The number of additional elements that this queue can ideally accept without blocking
+# TYPE executor_queue_remaining_tasks gauge
+# HELP executor_queued_tasks The approximate number of tasks that are queued for execution
+# TYPE executor_queued_tasks gauge
+# HELP hikaricp_connections Total connections
+# TYPE hikaricp_connections gauge
+# HELP hikaricp_connections_acquire_seconds Connection acquire time
+# TYPE hikaricp_connections_acquire_seconds summary
+# HELP hikaricp_connections_acquire_seconds_max Connection acquire time
+# TYPE hikaricp_connections_acquire_seconds_max gauge
+# HELP hikaricp_connections_active Active connections
+# TYPE hikaricp_connections_active gauge
+# HELP hikaricp_connections_creation_seconds Connection creation time
+# TYPE hikaricp_connections_creation_seconds summary
+# HELP hikaricp_connections_creation_seconds_max Connection creation time
+# TYPE hikaricp_connections_creation_seconds_max gauge
+# HELP hikaricp_connections_idle Idle connections
+# TYPE hikaricp_connections_idle gauge
+# HELP hikaricp_connections_max Max connections
+# TYPE hikaricp_connections_max gauge
+# HELP hikaricp_connections_min Min connections
+# TYPE hikaricp_connections_min gauge
+# HELP hikaricp_connections_pending Pending threads
+# TYPE hikaricp_connections_pending gauge
+# HELP hikaricp_connections_timeout_total Connection timeout total count
+# TYPE hikaricp_connections_timeout_total counter
+# HELP hikaricp_connections_usage_seconds Connection usage time
+# TYPE hikaricp_connections_usage_seconds summary
+# HELP hikaricp_connections_usage_seconds_max Connection usage time
+# TYPE hikaricp_connections_usage_seconds_max gauge
+# HELP http_server_requests_active_seconds
+# TYPE http_server_requests_active_seconds summary
+# HELP http_server_requests_active_seconds_max
+# TYPE http_server_requests_active_seconds_max gauge
+# HELP http_server_requests_seconds
+# TYPE http_server_requests_seconds summary
+http_server_requests_seconds_count{error="none",exception="none",method="GET",outcome="SUCCESS",status="200",uri="/actuator/health"} 2
+http_server_requests_seconds_count{error="none",exception="none",method="GET",outcome="SUCCESS",status="200",uri="/actuator/prometheus"} 1
+http_server_requests_seconds_count{error="none",exception="none",method="GET",outcome="SUCCESS",status="200",uri="/api/achievements"} 200
+http_server_requests_seconds_count{error="none",exception="none",method="GET",outcome="SUCCESS",status="200",uri="/api/achievements/daily-missions/active"} 200
+http_server_requests_seconds_count{error="none",exception="none",method="POST",outcome="CLIENT_ERROR",status="404",uri="/api/achievements/daily-missions/{missionId}/claim"} 50
+http_server_requests_seconds_count{error="none",exception="none",method="POST",outcome="CLIENT_ERROR",status="409",uri="/api/achievements/admin"} 1
+http_server_requests_seconds_count{error="none",exception="none",method="POST",outcome="CLIENT_ERROR",status="409",uri="/api/achievements/admin/daily-missions"} 1
+http_server_requests_seconds_count{error="none",exception="none",method="POST",outcome="SUCCESS",status="201",uri="/api/achievements/admin"} 1
+http_server_requests_seconds_count{error="none",exception="none",method="POST",outcome="SUCCESS",status="201",uri="/api/achievements/admin/daily-missions"} 1
+# HELP http_server_requests_seconds_max
+# TYPE http_server_requests_seconds_max gauge
+# HELP jdbc_connections_active Current number of active connections that have been allocated from the data source.
+# TYPE jdbc_connections_active gauge
+# HELP jdbc_connections_idle Number of established but idle connections.
+# TYPE jdbc_connections_idle gauge
+# HELP jdbc_connections_max Maximum number of active connections that can be allocated at the same time.
+# TYPE jdbc_connections_max gauge
+# HELP jdbc_connections_min Minimum number of idle connections in the pool.
+# TYPE jdbc_connections_min gauge
+# HELP jvm_info JVM version info
+# TYPE jvm_info gauge
+# HELP jvm_buffer_count_buffers An estimate of the number of buffers in the pool
+# TYPE jvm_buffer_count_buffers gauge
+# HELP jvm_buffer_memory_used_bytes An estimate of the memory that the Java virtual machine is using for this buffer pool
+# TYPE jvm_buffer_memory_used_bytes gauge
+# HELP jvm_buffer_total_capacity_bytes An estimate of the total capacity of the buffers in this pool
+# TYPE jvm_buffer_total_capacity_bytes gauge
+# HELP jvm_classes_loaded_classes The number of classes that are currently loaded in the Java virtual machine
+# TYPE jvm_classes_loaded_classes gauge
+# HELP jvm_classes_loaded_count_classes_total The number of classes loaded in the Java virtual machine
+# TYPE jvm_classes_loaded_count_classes_total counter
+# HELP jvm_classes_unloaded_classes_total The number of classes unloaded in the Java virtual machine
+# TYPE jvm_classes_unloaded_classes_total counter
+# HELP jvm_compilation_time_ms_total The approximate accumulated elapsed time spent in compilation
+# TYPE jvm_compilation_time_ms_total counter
+# HELP jvm_gc_concurrent_phase_time_seconds Time spent in concurrent phase
+# TYPE jvm_gc_concurrent_phase_time_seconds summary
+# HELP jvm_gc_concurrent_phase_time_seconds_max Time spent in concurrent phase
+# TYPE jvm_gc_concurrent_phase_time_seconds_max gauge
+# HELP jvm_gc_live_data_size_bytes Size of long-lived heap memory pool after reclamation
+# TYPE jvm_gc_live_data_size_bytes gauge
+# HELP jvm_gc_max_data_size_bytes Max size of long-lived heap memory pool
+# TYPE jvm_gc_max_data_size_bytes gauge
+# HELP jvm_gc_memory_allocated_bytes_total Incremented for an increase in the size of the (young) heap memory pool after one GC to before the next
+# TYPE jvm_gc_memory_allocated_bytes_total counter
+# HELP jvm_gc_memory_promoted_bytes_total Count of positive increases in the size of the old generation memory pool before GC to after GC
+# TYPE jvm_gc_memory_promoted_bytes_total counter
+# HELP jvm_gc_overhead An approximation of the percent of CPU time used by GC activities over the last lookback period or since monitoring began, whichever is shorter, in the range [0..1]
+# TYPE jvm_gc_overhead gauge
+# HELP jvm_gc_pause_seconds Time spent in GC pause
+# TYPE jvm_gc_pause_seconds summary
+# HELP jvm_gc_pause_seconds_max Time spent in GC pause
+# TYPE jvm_gc_pause_seconds_max gauge
+# HELP jvm_memory_committed_bytes The amount of memory in bytes that is committed for the Java virtual machine to use
+# TYPE jvm_memory_committed_bytes gauge
+# HELP jvm_memory_max_bytes The maximum amount of memory in bytes that can be used for memory management
+# TYPE jvm_memory_max_bytes gauge
+# HELP jvm_memory_usage_after_gc The percentage of long-lived heap pool used after the last GC event, in the range [0..1]
+# TYPE jvm_memory_usage_after_gc gauge
+# HELP jvm_memory_used_bytes The amount of used memory
+# TYPE jvm_memory_used_bytes gauge
+jvm_memory_used_bytes{area="heap",id="G1 Eden Space"} 2.9360128E7
+jvm_memory_used_bytes{area="heap",id="G1 Old Gen"} 2.9970976E7
+jvm_memory_used_bytes{area="heap",id="G1 Survivor Space"} 4911136.0
+jvm_memory_used_bytes{area="nonheap",id="CodeHeap 'non-nmethods'"} 1852288.0
+jvm_memory_used_bytes{area="nonheap",id="CodeHeap 'non-profiled nmethods'"} 7678976.0
+jvm_memory_used_bytes{area="nonheap",id="CodeHeap 'profiled nmethods'"} 2.1071616E7
+jvm_memory_used_bytes{area="nonheap",id="Compressed Class Space"} 9277288.0
+jvm_memory_used_bytes{area="nonheap",id="Metaspace"} 7.5897864E7
+# HELP jvm_threads_daemon_threads The current number of live daemon threads
+# TYPE jvm_threads_daemon_threads gauge
+# HELP jvm_threads_live_threads The current number of live threads including both daemon and non-daemon threads
+# TYPE jvm_threads_live_threads gauge
+# HELP jvm_threads_peak_threads The peak live thread count since the Java virtual machine started or peak was reset
+# TYPE jvm_threads_peak_threads gauge
+# HELP jvm_threads_started_threads_total The total number of application threads started in the JVM
+# TYPE jvm_threads_started_threads_total counter
+# HELP jvm_threads_states_threads The current number of threads
+# TYPE jvm_threads_states_threads gauge
+# HELP logback_events_total Number of log events that were enabled by the effective log level
+# TYPE logback_events_total counter
+# HELP process_cpu_time_ns_total The "cpu time" used by the Java Virtual Machine process
+# TYPE process_cpu_time_ns_total counter
+# HELP process_cpu_usage The "recent cpu usage" for the Java Virtual Machine process
+# TYPE process_cpu_usage gauge
+process_cpu_usage 0.09347911901984847
+# HELP process_start_time_seconds Start time of the process since unix epoch.
+# TYPE process_start_time_seconds gauge
+# HELP process_uptime_seconds The uptime of the Java virtual machine
+# TYPE process_uptime_seconds gauge
+# HELP rabbitmq_acknowledged_total
+# TYPE rabbitmq_acknowledged_total counter
+# HELP rabbitmq_acknowledged_published_total
+# TYPE rabbitmq_acknowledged_published_total counter
+# HELP rabbitmq_channels
+# TYPE rabbitmq_channels gauge
+# HELP rabbitmq_connections
+# TYPE rabbitmq_connections gauge
+# HELP rabbitmq_consumed_total
+# TYPE rabbitmq_consumed_total counter
+# HELP rabbitmq_failed_to_publish_total
+# TYPE rabbitmq_failed_to_publish_total counter
+# HELP rabbitmq_not_acknowledged_published_total
+# TYPE rabbitmq_not_acknowledged_published_total counter
+# HELP rabbitmq_published_total
+# TYPE rabbitmq_published_total counter
+# HELP rabbitmq_rejected_total
+# TYPE rabbitmq_rejected_total counter
+# HELP rabbitmq_requeued_total
+# TYPE rabbitmq_requeued_total counter
+# HELP rabbitmq_unrouted_published_total
+# TYPE rabbitmq_unrouted_published_total counter
+# HELP spring_security_authorizations_active_seconds
+# TYPE spring_security_authorizations_active_seconds summary
+# HELP spring_security_authorizations_active_seconds_max
+# TYPE spring_security_authorizations_active_seconds_max gauge
+# HELP spring_security_authorizations_seconds
+# TYPE spring_security_authorizations_seconds summary
+# HELP spring_security_authorizations_seconds_max
+# TYPE spring_security_authorizations_seconds_max gauge
+# HELP spring_security_filterchains_access_exceptions_after_total
+# TYPE spring_security_filterchains_access_exceptions_after_total counter
+# HELP spring_security_filterchains_access_exceptions_before_total
+# TYPE spring_security_filterchains_access_exceptions_before_total counter
+# HELP spring_security_filterchains_active_seconds
+# TYPE spring_security_filterchains_active_seconds summary
+# HELP spring_security_filterchains_active_seconds_max
+# TYPE spring_security_filterchains_active_seconds_max gauge
+# HELP spring_security_filterchains_authentication_anonymous_after_total
+# TYPE spring_security_filterchains_authentication_anonymous_after_total counter
+# HELP spring_security_filterchains_authentication_anonymous_before_total
+# TYPE spring_security_filterchains_authentication_anonymous_before_total counter
+# HELP spring_security_filterchains_authorization_after_total
+# TYPE spring_security_filterchains_authorization_after_total counter
+# HELP spring_security_filterchains_authorization_before_total
+# TYPE spring_security_filterchains_authorization_before_total counter
+# HELP spring_security_filterchains_context_async_after_total
+# TYPE spring_security_filterchains_context_async_after_total counter
+# HELP spring_security_filterchains_context_async_before_total
+# TYPE spring_security_filterchains_context_async_before_total counter
+# HELP spring_security_filterchains_context_holder_after_total
+# TYPE spring_security_filterchains_context_holder_after_total counter
+# HELP spring_security_filterchains_context_holder_before_total
+# TYPE spring_security_filterchains_context_holder_before_total counter
+# HELP spring_security_filterchains_context_servlet_after_total
+# TYPE spring_security_filterchains_context_servlet_after_total counter
+# HELP spring_security_filterchains_context_servlet_before_total
+# TYPE spring_security_filterchains_context_servlet_before_total counter
+# HELP spring_security_filterchains_header_after_total
+# TYPE spring_security_filterchains_header_after_total counter
+# HELP spring_security_filterchains_header_before_total
+# TYPE spring_security_filterchains_header_before_total counter
+# HELP spring_security_filterchains_logout_after_total
+# TYPE spring_security_filterchains_logout_after_total counter
+# HELP spring_security_filterchains_logout_before_total
+# TYPE spring_security_filterchains_logout_before_total counter
+# HELP spring_security_filterchains_requestcache_after_total
+# TYPE spring_security_filterchains_requestcache_after_total counter
+# HELP spring_security_filterchains_requestcache_before_total
+# TYPE spring_security_filterchains_requestcache_before_total counter
+# HELP spring_security_filterchains_seconds
+# TYPE spring_security_filterchains_seconds summary
+# HELP spring_security_filterchains_seconds_max
+# TYPE spring_security_filterchains_seconds_max gauge
+# HELP spring_security_filterchains_session_urlencoding_after_total
+# TYPE spring_security_filterchains_session_urlencoding_after_total counter
+# HELP spring_security_filterchains_session_urlencoding_before_total
+# TYPE spring_security_filterchains_session_urlencoding_before_total counter
+# HELP spring_security_http_secured_requests_active_seconds
+# TYPE spring_security_http_secured_requests_active_seconds summary
+# HELP spring_security_http_secured_requests_active_seconds_max
+# TYPE spring_security_http_secured_requests_active_seconds_max gauge
+# HELP spring_security_http_secured_requests_seconds
+# TYPE spring_security_http_secured_requests_seconds summary
+# HELP spring_security_http_secured_requests_seconds_max
+# TYPE spring_security_http_secured_requests_seconds_max gauge
+# HELP system_cpu_count The number of processors available to the Java virtual machine
+# TYPE system_cpu_count gauge
+# HELP system_cpu_usage The "recent cpu usage" of the system the application is running in
+# TYPE system_cpu_usage gauge
+# HELP tomcat_sessions_active_current_sessions
+# TYPE tomcat_sessions_active_current_sessions gauge
+# HELP tomcat_sessions_active_max_sessions
+# TYPE tomcat_sessions_active_max_sessions gauge
+# HELP tomcat_sessions_alive_max_seconds
+# TYPE tomcat_sessions_alive_max_seconds gauge
+# HELP tomcat_sessions_created_sessions_total
+# TYPE tomcat_sessions_created_sessions_total counter
+# HELP tomcat_sessions_expired_sessions_total
+# TYPE tomcat_sessions_expired_sessions_total counter
+# HELP tomcat_sessions_rejected_sessions_total
+# TYPE tomcat_sessions_rejected_sessions_total counter
+# HELP yomu_achievements_action_duration_seconds
+# TYPE yomu_achievements_action_duration_seconds histogram
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.001"} 0
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.001048576"} 0
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.001398101"} 0
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.001747626"} 0
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.002097151"} 2
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.002446676"} 13
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.002796201"} 27
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.003145726"} 37
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.003495251"} 42
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.003844776"} 44
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.004194304"} 46
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.005592405"} 48
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.006990506"} 49
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.008388607"} 49
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.009786708"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.011184809"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.01258291"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.013981011"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.015379112"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.016777216"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.022369621"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.027962026"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.033554431"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.039146836"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.044739241"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.050331646"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.055924051"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.061516456"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.067108864"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.089478485"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.111848106"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.134217727"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.156587348"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.178956969"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.20132659"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.223696211"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.246065832"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.268435456"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.357913941"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.447392426"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.536870911"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.626349396"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.715827881"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.805306366"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.894784851"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="0.984263336"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="1.073741824"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="1.431655765"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="1.789569706"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="2.147483647"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="2.505397588"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="2.863311529"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="3.22122547"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="3.579139411"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="3.937053352"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="4.294967296"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="5.726623061"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="7.158278826"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="8.589934591"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="10.021590356"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="11.453246121"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="12.884901886"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="14.316557651"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="15.748213416"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="17.179869184"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="22.906492245"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="28.633115306"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="30.0"} 50
+yomu_achievements_action_duration_seconds_bucket{action="claim_daily_mission_reward",outcome="failure",le="+Inf"} 50
+yomu_achievements_action_duration_seconds_count{action="claim_daily_mission_reward",outcome="failure"} 50
+yomu_achievements_action_duration_seconds_sum{action="claim_daily_mission_reward",outcome="failure"} 0.1523318
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.001"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.001048576"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.001398101"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.001747626"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.002097151"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.002446676"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.002796201"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.003145726"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.003495251"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.003844776"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.004194304"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.005592405"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.006990506"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.008388607"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.009786708"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.011184809"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.01258291"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.013981011"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.015379112"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.016777216"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.022369621"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.027962026"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.033554431"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.039146836"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.044739241"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.050331646"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.055924051"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.061516456"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.067108864"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.089478485"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.111848106"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.134217727"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.156587348"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.178956969"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.20132659"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.223696211"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.246065832"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.268435456"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.357913941"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.447392426"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.536870911"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.626349396"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.715827881"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.805306366"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.894784851"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="0.984263336"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="1.073741824"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="1.431655765"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="1.789569706"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="2.147483647"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="2.505397588"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="2.863311529"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="3.22122547"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="3.579139411"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="3.937053352"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="4.294967296"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="5.726623061"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="7.158278826"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="8.589934591"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="10.021590356"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="11.453246121"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="12.884901886"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="14.316557651"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="15.748213416"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="17.179869184"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="22.906492245"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="28.633115306"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="30.0"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="failure",le="+Inf"} 1
+yomu_achievements_action_duration_seconds_count{action="create_achievement",outcome="failure"} 1
+yomu_achievements_action_duration_seconds_sum{action="create_achievement",outcome="failure"} 0.0048905
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.001"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.001048576"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.001398101"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.001747626"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.002097151"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.002446676"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.002796201"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.003145726"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.003495251"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.003844776"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.004194304"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.005592405"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.006990506"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.008388607"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.009786708"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.011184809"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.01258291"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.013981011"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.015379112"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.016777216"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.022369621"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.027962026"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.033554431"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.039146836"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.044739241"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.050331646"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.055924051"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.061516456"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.067108864"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.089478485"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.111848106"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.134217727"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.156587348"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.178956969"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.20132659"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.223696211"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.246065832"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.268435456"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.357913941"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.447392426"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.536870911"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.626349396"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.715827881"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.805306366"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.894784851"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="0.984263336"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="1.073741824"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="1.431655765"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="1.789569706"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="2.147483647"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="2.505397588"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="2.863311529"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="3.22122547"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="3.579139411"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="3.937053352"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="4.294967296"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="5.726623061"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="7.158278826"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="8.589934591"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="10.021590356"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="11.453246121"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="12.884901886"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="14.316557651"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="15.748213416"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="17.179869184"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="22.906492245"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="28.633115306"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="30.0"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_achievement",outcome="success",le="+Inf"} 1
+yomu_achievements_action_duration_seconds_count{action="create_achievement",outcome="success"} 1
+yomu_achievements_action_duration_seconds_sum{action="create_achievement",outcome="success"} 0.0081141
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.001"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.001048576"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.001398101"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.001747626"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.002097151"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.002446676"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.002796201"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.003145726"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.003495251"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.003844776"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.004194304"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.005592405"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.006990506"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.008388607"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.009786708"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.011184809"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.01258291"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.013981011"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.015379112"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.016777216"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.022369621"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.027962026"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.033554431"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.039146836"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.044739241"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.050331646"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.055924051"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.061516456"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.067108864"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.089478485"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.111848106"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.134217727"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.156587348"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.178956969"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.20132659"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.223696211"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.246065832"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.268435456"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.357913941"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.447392426"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.536870911"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.626349396"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.715827881"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.805306366"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.894784851"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="0.984263336"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="1.073741824"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="1.431655765"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="1.789569706"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="2.147483647"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="2.505397588"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="2.863311529"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="3.22122547"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="3.579139411"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="3.937053352"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="4.294967296"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="5.726623061"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="7.158278826"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="8.589934591"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="10.021590356"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="11.453246121"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="12.884901886"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="14.316557651"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="15.748213416"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="17.179869184"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="22.906492245"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="28.633115306"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="30.0"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="failure",le="+Inf"} 1
+yomu_achievements_action_duration_seconds_count{action="create_daily_mission",outcome="failure"} 1
+yomu_achievements_action_duration_seconds_sum{action="create_daily_mission",outcome="failure"} 0.0033726
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.001"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.001048576"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.001398101"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.001747626"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.002097151"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.002446676"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.002796201"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.003145726"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.003495251"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.003844776"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.004194304"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.005592405"} 0
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.006990506"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.008388607"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.009786708"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.011184809"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.01258291"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.013981011"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.015379112"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.016777216"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.022369621"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.027962026"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.033554431"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.039146836"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.044739241"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.050331646"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.055924051"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.061516456"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.067108864"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.089478485"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.111848106"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.134217727"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.156587348"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.178956969"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.20132659"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.223696211"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.246065832"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.268435456"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.357913941"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.447392426"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.536870911"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.626349396"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.715827881"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.805306366"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.894784851"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="0.984263336"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="1.073741824"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="1.431655765"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="1.789569706"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="2.147483647"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="2.505397588"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="2.863311529"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="3.22122547"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="3.579139411"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="3.937053352"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="4.294967296"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="5.726623061"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="7.158278826"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="8.589934591"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="10.021590356"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="11.453246121"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="12.884901886"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="14.316557651"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="15.748213416"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="17.179869184"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="22.906492245"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="28.633115306"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="30.0"} 1
+yomu_achievements_action_duration_seconds_bucket{action="create_daily_mission",outcome="success",le="+Inf"} 1
+yomu_achievements_action_duration_seconds_count{action="create_daily_mission",outcome="success"} 1
+yomu_achievements_action_duration_seconds_sum{action="create_daily_mission",outcome="success"} 0.006629
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.001"} 0
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.001048576"} 0
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.001398101"} 0
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.001747626"} 3
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.002097151"} 45
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.002446676"} 89
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.002796201"} 128
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.003145726"} 150
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.003495251"} 170
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.003844776"} 177
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.004194304"} 185
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.005592405"} 196
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.006990506"} 197
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.008388607"} 199
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.009786708"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.011184809"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.01258291"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.013981011"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.015379112"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.016777216"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.022369621"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.027962026"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.033554431"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.039146836"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.044739241"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.050331646"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.055924051"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.061516456"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.067108864"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.089478485"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.111848106"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.134217727"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.156587348"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.178956969"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.20132659"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.223696211"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.246065832"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.268435456"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.357913941"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.447392426"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.536870911"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.626349396"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.715827881"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.805306366"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.894784851"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="0.984263336"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="1.073741824"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="1.431655765"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="1.789569706"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="2.147483647"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="2.505397588"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="2.863311529"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="3.22122547"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="3.579139411"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="3.937053352"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="4.294967296"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="5.726623061"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="7.158278826"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="8.589934591"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="10.021590356"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="11.453246121"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="12.884901886"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="14.316557651"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="15.748213416"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="17.179869184"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="22.906492245"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="28.633115306"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="30.0"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_achievement_progress",outcome="success",le="+Inf"} 200
+yomu_achievements_action_duration_seconds_count{action="list_achievement_progress",outcome="success"} 200
+yomu_achievements_action_duration_seconds_sum{action="list_achievement_progress",outcome="success"} 0.5597245
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.001"} 0
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.001048576"} 0
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.001398101"} 0
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.001747626"} 1
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.002097151"} 29
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.002446676"} 77
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.002796201"} 115
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.003145726"} 146
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.003495251"} 156
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.003844776"} 168
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.004194304"} 181
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.005592405"} 198
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.006990506"} 199
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.008388607"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.009786708"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.011184809"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.01258291"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.013981011"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.015379112"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.016777216"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.022369621"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.027962026"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.033554431"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.039146836"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.044739241"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.050331646"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.055924051"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.061516456"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.067108864"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.089478485"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.111848106"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.134217727"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.156587348"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.178956969"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.20132659"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.223696211"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.246065832"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.268435456"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.357913941"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.447392426"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.536870911"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.626349396"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.715827881"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.805306366"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.894784851"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="0.984263336"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="1.073741824"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="1.431655765"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="1.789569706"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="2.147483647"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="2.505397588"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="2.863311529"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="3.22122547"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="3.579139411"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="3.937053352"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="4.294967296"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="5.726623061"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="7.158278826"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="8.589934591"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="10.021590356"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="11.453246121"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="12.884901886"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="14.316557651"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="15.748213416"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="17.179869184"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="22.906492245"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="28.633115306"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="30.0"} 200
+yomu_achievements_action_duration_seconds_bucket{action="list_active_daily_missions",outcome="success",le="+Inf"} 200
+yomu_achievements_action_duration_seconds_count{action="list_active_daily_missions",outcome="success"} 200
+yomu_achievements_action_duration_seconds_sum{action="list_active_daily_missions",outcome="success"} 0.5771202
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.001"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.001048576"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.001398101"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.001747626"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.002097151"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.002446676"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.002796201"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.003145726"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.003495251"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.003844776"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.004194304"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.005592405"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.006990506"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.008388607"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.009786708"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.011184809"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.01258291"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.013981011"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.015379112"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.016777216"} 0
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.022369621"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.027962026"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.033554431"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.039146836"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.044739241"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.050331646"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.055924051"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.061516456"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.067108864"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.089478485"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.111848106"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.134217727"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.156587348"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.178956969"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.20132659"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.223696211"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.246065832"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.268435456"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.357913941"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.447392426"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.536870911"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.626349396"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.715827881"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.805306366"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.894784851"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="0.984263336"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="1.073741824"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="1.431655765"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="1.789569706"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="2.147483647"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="2.505397588"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="2.863311529"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="3.22122547"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="3.579139411"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="3.937053352"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="4.294967296"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="5.726623061"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="7.158278826"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="8.589934591"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="10.021590356"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="11.453246121"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="12.884901886"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="14.316557651"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="15.748213416"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="17.179869184"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="22.906492245"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="28.633115306"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="30.0"} 1
+yomu_achievements_action_duration_seconds_bucket{action="rotate_daily_missions",outcome="success",le="+Inf"} 1
+yomu_achievements_action_duration_seconds_count{action="rotate_daily_missions",outcome="success"} 1
+yomu_achievements_action_duration_seconds_sum{action="rotate_daily_missions",outcome="success"} 0.0198221
+# HELP yomu_achievements_action_duration_seconds_max
+# TYPE yomu_achievements_action_duration_seconds_max gauge
+yomu_achievements_action_duration_seconds_max{action="claim_daily_mission_reward",outcome="failure"} 0.0089458
+yomu_achievements_action_duration_seconds_max{action="create_achievement",outcome="failure"} 0.0048905
+yomu_achievements_action_duration_seconds_max{action="create_achievement",outcome="success"} 0.0081141
+yomu_achievements_action_duration_seconds_max{action="create_daily_mission",outcome="failure"} 0.0033726
+yomu_achievements_action_duration_seconds_max{action="create_daily_mission",outcome="success"} 0.006629
+yomu_achievements_action_duration_seconds_max{action="list_achievement_progress",outcome="success"} 0.0088699
+yomu_achievements_action_duration_seconds_max{action="list_active_daily_missions",outcome="success"} 0.0070998
+yomu_achievements_action_duration_seconds_max{action="rotate_daily_missions",outcome="success"} 0.0198221
+# HELP yomu_achievements_actions_total
+# TYPE yomu_achievements_actions_total counter
+yomu_achievements_actions_total{action="claim_daily_mission_reward",outcome="failure"} 50.0
+yomu_achievements_actions_total{action="create_achievement",outcome="failure"} 1.0
+yomu_achievements_actions_total{action="create_achievement",outcome="success"} 1.0
+yomu_achievements_actions_total{action="create_daily_mission",outcome="failure"} 1.0
+yomu_achievements_actions_total{action="create_daily_mission",outcome="success"} 1.0
+yomu_achievements_actions_total{action="list_achievement_progress",outcome="success"} 200.0
+yomu_achievements_actions_total{action="list_active_daily_missions",outcome="success"} 200.0
+yomu_achievements_actions_total{action="rotate_daily_missions",outcome="success"} 1.0
