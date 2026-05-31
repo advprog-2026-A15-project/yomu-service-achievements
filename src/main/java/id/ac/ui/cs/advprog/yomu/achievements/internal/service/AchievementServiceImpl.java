@@ -83,6 +83,15 @@ public class AchievementServiceImpl implements AchievementService {
     }
 
     @Override
+    public List<AchievementProgressResponse> listCompletedAchievementProgress(UUID userId) {
+        return metrics.recordAction("list_completed_achievement_progress", () ->
+            repository.findUnlockedAchievementProgressForUser(userId).stream()
+                .map(this::toProgressResponse)
+                .toList()
+        );
+    }
+
+    @Override
     @Transactional
     public DailyMissionResponse createDailyMission(CreateDailyMissionRequest request) {
         return metrics.recordAction("create_daily_mission", () -> {
@@ -93,10 +102,7 @@ public class AchievementServiceImpl implements AchievementService {
             LocalDate activeFrom = request.activeFrom() != null ? request.activeFrom() : LocalDate.now();
             LocalDate activeUntil = request.activeUntil() != null ? request.activeUntil() : activeFrom.plusDays(1);
 
-            if (!activeUntil.isAfter(activeFrom)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Tanggal selesai daily mission harus setelah tanggal mulai");
-            }
+            validateDailyMissionDateRange(activeFrom, activeUntil);
 
             if (repository.existsByDailyMissionCode(code)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
@@ -118,6 +124,66 @@ public class AchievementServiceImpl implements AchievementService {
 
             repository.saveDailyMission(mission);
             return toMissionResponse(mission);
+        });
+    }
+
+    @Override
+    public List<DailyMissionResponse> listDailyMissions() {
+        return metrics.recordAction("list_daily_missions", () ->
+            repository.findAllDailyMissions().stream()
+                .map(this::toMissionResponse)
+                .toList()
+        );
+    }
+
+    @Override
+    @Transactional
+    public DailyMissionResponse updateDailyMission(UUID missionId, CreateDailyMissionRequest request) {
+        return metrics.recordAction("update_daily_mission", () -> {
+            DailyMission existing = repository.findDailyMissionById(missionId)
+                .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Daily mission tidak ditemukan"));
+
+            String code = hasText(request.code()) ? resolveCode(request.code(), request.name()) : existing.code();
+            AchievementMetric metric = requireMetric(request.metric());
+            String description = normalizeNullableText(request.description());
+            int rewardPoints = request.rewardPoints() == null ? 0 : request.rewardPoints();
+            LocalDate activeFrom = request.activeFrom() != null ? request.activeFrom() : existing.activeFrom();
+            LocalDate activeUntil = request.activeUntil() != null ? request.activeUntil() : existing.activeUntil();
+
+            validateDailyMissionDateRange(activeFrom, activeUntil);
+
+            if (repository.existsByDailyMissionCodeForDifferentId(code, missionId)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Daily mission dengan kode '" + code + "' sudah ada");
+            }
+
+            DailyMission updatedMission = new DailyMission(
+                existing.id(),
+                code,
+                request.name().trim(),
+                description,
+                metric,
+                request.targetCount(),
+                rewardPoints,
+                activeFrom,
+                activeUntil,
+                existing.createdAt()
+            );
+
+            repository.updateDailyMission(updatedMission);
+            return toMissionResponse(updatedMission);
+        });
+    }
+
+    @Override
+    @Transactional
+    public void deleteDailyMission(UUID missionId) {
+        metrics.recordAction("delete_daily_mission", () -> {
+            repository.findDailyMissionById(missionId)
+                .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Daily mission tidak ditemukan"));
+            repository.deleteDailyMission(missionId);
         });
     }
 
@@ -447,6 +513,13 @@ public class AchievementServiceImpl implements AchievementService {
                 "Metric wajib diisi");
         }
         return metric;
+    }
+
+    private void validateDailyMissionDateRange(LocalDate activeFrom, LocalDate activeUntil) {
+        if (!activeUntil.isAfter(activeFrom)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Tanggal selesai daily mission harus setelah tanggal mulai");
+        }
     }
 
     private String normalizeNullableText(String value) {

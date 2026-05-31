@@ -22,7 +22,15 @@ public interface AchievementService {
 
     List<AchievementProgressResponse> listAchievementProgress(UUID userId);
 
+    List<AchievementProgressResponse> listCompletedAchievementProgress(UUID userId);
+
     DailyMissionResponse createDailyMission(CreateDailyMissionRequest request);
+
+    List<DailyMissionResponse> listDailyMissions();
+
+    DailyMissionResponse updateDailyMission(UUID missionId, CreateDailyMissionRequest request);
+
+    void deleteDailyMission(UUID missionId);
 
     List<DailyMissionProgressResponse> listActiveDailyMissions(UUID userId);
 

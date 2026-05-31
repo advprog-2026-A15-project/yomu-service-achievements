@@ -197,6 +197,29 @@ public class JdbcAchievementRepository implements AchievementRepository {
     }
 
     @Override
+    public List<AchievementProgress> findUnlockedAchievementProgressForUser(UUID userId) {
+        return jdbcTemplate.query("""
+             SELECT a.id, a.code, a.name, a.description, a.metric, a.milestone, a.active, a.created_at,
+                    p.progress_count,
+                    p.unlocked_at,
+                    COALESCE(p.is_pinned, FALSE) AS is_pinned
+             FROM achievements a
+             JOIN user_achievement_progress p
+                 ON p.achievement_id = a.id AND p.user_id = ?
+             WHERE a.active = TRUE AND p.unlocked_at IS NOT NULL
+             ORDER BY COALESCE(p.is_pinned, FALSE) DESC, p.unlocked_at DESC, a.name ASC
+             """,
+             (rs, rowNum) -> new AchievementProgress(
+                 achievementRowMapper().mapRow(rs, rowNum),
+                 rs.getInt("progress_count"),
+                 timestampToInstant(rs.getTimestamp("unlocked_at")),
+                 rs.getBoolean("is_pinned")
+             ),
+             userId
+         );
+    }
+
+    @Override
     public Optional<AchievementProgressState> findAchievementProgressState(UUID userId, UUID achievementId) {
         return jdbcTemplate.query("""
             SELECT progress_count, unlocked_at, is_pinned
@@ -281,11 +304,60 @@ public class JdbcAchievementRepository implements AchievementRepository {
     }
 
     @Override
+    public DailyMission updateDailyMission(DailyMission mission) {
+        jdbcTemplate.update("""
+            UPDATE daily_missions
+            SET code = ?, name = ?, description = ?, metric = ?, target_count = ?,
+                reward_points = ?, active_from = ?, active_until = ?
+            WHERE id = ?
+            """,
+            mission.code(),
+            mission.name(),
+            mission.description(),
+            mission.metric().name(),
+            mission.targetCount(),
+            mission.rewardPoints(),
+            Date.valueOf(mission.activeFrom()),
+            Date.valueOf(mission.activeUntil()),
+            mission.id()
+        );
+        return mission;
+    }
+
+    @Override
+    public void deleteDailyMission(UUID missionId) {
+        jdbcTemplate.update("DELETE FROM user_daily_mission_progress WHERE mission_id = ?", missionId);
+        jdbcTemplate.update("DELETE FROM daily_missions WHERE id = ?", missionId);
+    }
+
+    @Override
+    public List<DailyMission> findAllDailyMissions() {
+        return jdbcTemplate.query("""
+            SELECT id, code, name, description, metric, target_count, reward_points, active_from, active_until, created_at
+            FROM daily_missions
+            ORDER BY active_from DESC, created_at DESC, name ASC
+            """,
+            dailyMissionRowMapper()
+        );
+    }
+
+    @Override
     public boolean existsByDailyMissionCode(String code) {
         Integer count = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM daily_missions WHERE code = ?",
             Integer.class,
             code
+        );
+        return count != null && count > 0;
+    }
+
+    @Override
+    public boolean existsByDailyMissionCodeForDifferentId(String code, UUID missionId) {
+        Integer count = jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM daily_missions WHERE code = ? AND id <> ?",
+            Integer.class,
+            code,
+            missionId
         );
         return count != null && count > 0;
     }

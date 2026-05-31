@@ -795,6 +795,231 @@ class AchievementServiceImplTest {
     }
 
     @Test
+    void listCompletedAchievementProgress_returnsOnlyUnlockedAchievements() {
+        UUID userId = UUID.randomUUID();
+        repository.saveAchievement(new Achievement(
+            UUID.randomUUID(),
+            "LOCKED_READING",
+            "Locked Reading",
+            "Belum selesai.",
+            AchievementMetric.READING_COMPLETED,
+            5,
+            true,
+            Instant.now()
+        ));
+        service.recordQuizCompleted(new QuizCompletedEvent(
+            userId, UUID.randomUUID(), "quiz-1", 5, 5, Instant.now()));
+
+        List<AchievementProgressResponse> completed = service.listCompletedAchievementProgress(userId);
+
+        assertThat(completed)
+            .extracting(AchievementProgressResponse::code)
+            .containsExactly("FIRST_READ");
+        assertThat(completed.getFirst().unlocked()).isTrue();
+    }
+
+    @Test
+    void listDailyMissions_returnsInactiveAndActiveMissionsForAdmin() {
+        LocalDate today = LocalDate.now();
+        DailyMission expired = new DailyMission(
+            UUID.randomUUID(),
+            "EXPIRED",
+            "Expired Mission",
+            "Sudah selesai.",
+            AchievementMetric.READING_COMPLETED,
+            1,
+            5,
+            today.minusDays(3),
+            today.minusDays(2),
+            Instant.now().minusSeconds(30)
+        );
+        DailyMission active = new DailyMission(
+            UUID.randomUUID(),
+            "ACTIVE",
+            "Active Mission",
+            "Sedang aktif.",
+            AchievementMetric.QUIZ_COMPLETED,
+            1,
+            10,
+            today,
+            today.plusDays(1),
+            Instant.now()
+        );
+        repository.saveDailyMission(expired);
+        repository.saveDailyMission(active);
+
+        assertThat(service.listDailyMissions())
+            .extracting(DailyMissionResponse::code)
+            .containsExactly("ACTIVE", "EXPIRED");
+    }
+
+    @Test
+    void updateDailyMission_success_updatesEditableFields() {
+        LocalDate today = LocalDate.now();
+        DailyMission mission = new DailyMission(
+            UUID.randomUUID(),
+            "OLD_CODE",
+            "Old Mission",
+            "Old description",
+            AchievementMetric.READING_COMPLETED,
+            1,
+            5,
+            today,
+            today.plusDays(1),
+            Instant.now()
+        );
+        repository.saveDailyMission(mission);
+
+        DailyMissionResponse response = service.updateDailyMission(mission.id(), new CreateDailyMissionRequest(
+            "UPDATED_CODE",
+            "Updated Mission",
+            "Updated description",
+            AchievementMetric.QUIZ_COMPLETED,
+            3,
+            25,
+            today.plusDays(1),
+            today.plusDays(4)
+        ));
+
+        assertThat(response.code()).isEqualTo("UPDATED_CODE");
+        assertThat(response.name()).isEqualTo("Updated Mission");
+        assertThat(response.metric()).isEqualTo(AchievementMetric.QUIZ_COMPLETED.name());
+        assertThat(response.targetCount()).isEqualTo(3);
+        assertThat(response.rewardPoints()).isEqualTo(25);
+        assertThat(repository.findDailyMissionById(mission.id()))
+            .get()
+            .extracting(DailyMission::description)
+            .isEqualTo("Updated description");
+    }
+
+    @Test
+    void updateDailyMission_blankCode_keepsExistingCode() {
+        LocalDate today = LocalDate.now();
+        DailyMission mission = new DailyMission(
+            UUID.randomUUID(),
+            "KEEP_CODE",
+            "Old Mission",
+            "",
+            AchievementMetric.READING_COMPLETED,
+            1,
+            5,
+            today,
+            today.plusDays(1),
+            Instant.now()
+        );
+        repository.saveDailyMission(mission);
+
+        DailyMissionResponse response = service.updateDailyMission(mission.id(), new CreateDailyMissionRequest(
+            " ",
+            "New Name",
+            null,
+            AchievementMetric.READING_COMPLETED,
+            2,
+            null,
+            today,
+            today.plusDays(2)
+        ));
+
+        assertThat(response.code()).isEqualTo("KEEP_CODE");
+        assertThat(response.rewardPoints()).isZero();
+    }
+
+    @Test
+    void updateDailyMission_duplicateCode_throws409() {
+        LocalDate today = LocalDate.now();
+        DailyMission first = new DailyMission(
+            UUID.randomUUID(),
+            "FIRST",
+            "First Mission",
+            "",
+            AchievementMetric.READING_COMPLETED,
+            1,
+            5,
+            today,
+            today.plusDays(1),
+            Instant.now()
+        );
+        DailyMission second = new DailyMission(
+            UUID.randomUUID(),
+            "SECOND",
+            "Second Mission",
+            "",
+            AchievementMetric.QUIZ_COMPLETED,
+            1,
+            5,
+            today,
+            today.plusDays(1),
+            Instant.now()
+        );
+        repository.saveDailyMission(first);
+        repository.saveDailyMission(second);
+
+        assertThatThrownBy(() -> service.updateDailyMission(second.id(), new CreateDailyMissionRequest(
+            "FIRST",
+            "Second Mission",
+            null,
+            AchievementMetric.QUIZ_COMPLETED,
+            1,
+            5,
+            today,
+            today.plusDays(1)
+        )))
+            .isInstanceOf(ResponseStatusException.class)
+            .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
+                .isEqualTo(HttpStatus.CONFLICT));
+    }
+
+    @Test
+    void updateDailyMission_missingMission_throws404() {
+        LocalDate today = LocalDate.now();
+
+        assertThatThrownBy(() -> service.updateDailyMission(UUID.randomUUID(), new CreateDailyMissionRequest(
+            "MISSING",
+            "Missing",
+            null,
+            AchievementMetric.READING_COMPLETED,
+            1,
+            5,
+            today,
+            today.plusDays(1)
+        )))
+            .isInstanceOf(ResponseStatusException.class)
+            .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
+                .isEqualTo(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    void deleteDailyMission_success_removesMission() {
+        LocalDate today = LocalDate.now();
+        DailyMission mission = new DailyMission(
+            UUID.randomUUID(),
+            "DELETE_ME",
+            "Delete Me",
+            "",
+            AchievementMetric.READING_COMPLETED,
+            1,
+            5,
+            today,
+            today.plusDays(1),
+            Instant.now()
+        );
+        repository.saveDailyMission(mission);
+
+        service.deleteDailyMission(mission.id());
+
+        assertThat(repository.findDailyMissionById(mission.id())).isEmpty();
+        assertThat(service.listDailyMissions()).isEmpty();
+    }
+
+    @Test
+    void deleteDailyMission_missingMission_throws404() {
+        assertThatThrownBy(() -> service.deleteDailyMission(UUID.randomUUID()))
+            .isInstanceOf(ResponseStatusException.class)
+            .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
+                .isEqualTo(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
     void listAchievementProgress_returnsAllActiveAchievements() {
         UUID userId = UUID.randomUUID();
 
@@ -947,6 +1172,18 @@ class AchievementServiceImplTest {
         }
 
         @Override
+        public List<AchievementProgress> findUnlockedAchievementProgressForUser(UUID userId) {
+            return findAchievementProgressForUser(userId).stream()
+                .filter(progress -> progress.unlockedAt() != null)
+                .sorted(Comparator
+                    .comparing(AchievementProgress::isPinned)
+                    .reversed()
+                    .thenComparing(AchievementProgress::unlockedAt, Comparator.reverseOrder())
+                    .thenComparing(progress -> progress.achievement().name()))
+                .toList();
+        }
+
+        @Override
         public Optional<AchievementProgressState> findAchievementProgressState(
             UUID userId,
             UUID achievementId
@@ -993,8 +1230,46 @@ class AchievementServiceImplTest {
         }
 
         @Override
+        public DailyMission updateDailyMission(DailyMission mission) {
+            DailyMission existing = missionsById.get(mission.id());
+            if (existing != null) {
+                missionsByCode.remove(existing.code());
+            }
+            missionsById.put(mission.id(), mission);
+            missionsByCode.put(mission.code(), mission);
+            return mission;
+        }
+
+        @Override
+        public void deleteDailyMission(UUID missionId) {
+            DailyMission removed = missionsById.remove(missionId);
+            if (removed != null) {
+                missionsByCode.remove(removed.code());
+            }
+            missionProgress.keySet().removeIf(key -> key.targetId().equals(missionId));
+        }
+
+        @Override
+        public List<DailyMission> findAllDailyMissions() {
+            return missionsById.values().stream()
+                .sorted(Comparator
+                    .comparing(DailyMission::activeFrom)
+                    .reversed()
+                    .thenComparing(DailyMission::createdAt, Comparator.reverseOrder())
+                    .thenComparing(DailyMission::name))
+                .toList();
+        }
+
+        @Override
         public boolean existsByDailyMissionCode(String code) {
             return missionsByCode.containsKey(code);
+        }
+
+        @Override
+        public boolean existsByDailyMissionCodeForDifferentId(String code, UUID missionId) {
+            return Optional.ofNullable(missionsByCode.get(code))
+                .map(mission -> !mission.id().equals(missionId))
+                .orElse(false);
         }
 
         @Override

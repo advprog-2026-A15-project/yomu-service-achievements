@@ -67,3 +67,6 @@ public class ReadingCompletedListener {
         achievementService.recordClanPromoted(event);
     }
 }
+
+
+

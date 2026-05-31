@@ -30,8 +30,8 @@ public class AchievementsSecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/achievements/admin/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/achievements/admin").hasRole("ADMIN")
+                .requestMatchers("/api/achievements/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/achievements/admin").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

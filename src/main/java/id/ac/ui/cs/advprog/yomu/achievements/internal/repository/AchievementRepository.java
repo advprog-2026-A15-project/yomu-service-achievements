@@ -24,6 +24,8 @@ public interface AchievementRepository {
 
     List<AchievementProgress> findAchievementProgressForUser(UUID userId);
 
+    List<AchievementProgress> findUnlockedAchievementProgressForUser(UUID userId);
+
     Optional<AchievementProgressState> findAchievementProgressState(UUID userId, UUID achievementId);
 
     void saveAchievementProgress(UUID userId, UUID achievementId, int progressCount, Instant unlockedAt);
@@ -32,7 +34,15 @@ public interface AchievementRepository {
 
     DailyMission saveDailyMission(DailyMission mission);
 
+    DailyMission updateDailyMission(DailyMission mission);
+
+    void deleteDailyMission(UUID missionId);
+
+    List<DailyMission> findAllDailyMissions();
+
     boolean existsByDailyMissionCode(String code);
+
+    boolean existsByDailyMissionCodeForDifferentId(String code, UUID missionId);
 
     Optional<DailyMission> findDailyMissionById(UUID missionId);
 

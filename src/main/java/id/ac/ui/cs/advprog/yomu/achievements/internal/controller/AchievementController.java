@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,6 +55,13 @@ public class AchievementController {
         return achievementService.listAchievementProgress(resolveTargetUserId(userId, authentication));
     }
 
+    @GetMapping("/users/{userId}/completed")
+    public List<AchievementProgressResponse> listCompletedAchievements(
+        @PathVariable UUID userId
+    ) {
+        return achievementService.listCompletedAchievementProgress(userId);
+    }
+
     @PostMapping("/admin/daily-missions")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DailyMissionResponse> createDailyMission(
@@ -61,6 +69,30 @@ public class AchievementController {
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(achievementService.createDailyMission(request));
+    }
+
+    @GetMapping("/admin/daily-missions")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<DailyMissionResponse> listDailyMissions() {
+        return achievementService.listDailyMissions();
+    }
+
+    @PutMapping("/admin/daily-missions/{missionId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public DailyMissionResponse updateDailyMission(
+        @PathVariable UUID missionId,
+        @Valid @RequestBody CreateDailyMissionRequest request
+    ) {
+        return achievementService.updateDailyMission(missionId, request);
+    }
+
+    @DeleteMapping("/admin/daily-missions/{missionId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteDailyMission(
+        @PathVariable UUID missionId
+    ) {
+        achievementService.deleteDailyMission(missionId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/daily-missions/active")
