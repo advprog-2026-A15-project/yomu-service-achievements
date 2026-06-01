@@ -64,6 +64,129 @@ class AchievementControllerTest {
     }
 
     @Test
+    void listAchievements_nullAuthAndNullUserId_throwsUnauthorized() {
+        FakeAchievementService service = new FakeAchievementService();
+        AchievementController controller = new AchievementController(service);
+
+        assertThatThrownBy(() -> controller.listAchievements(null, null))
+            .isInstanceOf(ResponseStatusException.class)
+            .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
+                .isEqualTo(HttpStatus.UNAUTHORIZED));
+    }
+
+    @Test
+    void listAchievements_nullAuthButRequestedUserId_usesRequestedUserId() {
+        FakeAchievementService service = new FakeAchievementService();
+        AchievementController controller = new AchievementController(service);
+        UUID requestedId = UUID.randomUUID();
+
+        controller.listAchievements(requestedId, null);
+
+        assertThat(service.lastListProgressUserId).isEqualTo(requestedId);
+    }
+
+    @Test
+    void listAchievements_authAndNullRequestedUserId_usesAuthenticatedUserId() {
+        FakeAchievementService service = new FakeAchievementService();
+        AchievementController controller = new AchievementController(service);
+        UUID authenticatedId = UUID.randomUUID();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+            authenticatedId.toString(), null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+
+        controller.listAchievements(null, authentication);
+
+        assertThat(service.lastListProgressUserId).isEqualTo(authenticatedId);
+    }
+
+    @Test
+    void listAchievements_authAndSameUserId_returnsOk() {
+        FakeAchievementService service = new FakeAchievementService();
+        AchievementController controller = new AchievementController(service);
+        UUID userId = UUID.randomUUID();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+            userId.toString(), null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+
+        controller.listAchievements(userId, authentication);
+
+        assertThat(service.lastListProgressUserId).isEqualTo(userId);
+    }
+
+    @Test
+    void listAchievements_adminCanAccessOtherUserId() {
+        FakeAchievementService service = new FakeAchievementService();
+        AchievementController controller = new AchievementController(service);
+        UUID adminId = UUID.randomUUID();
+        UUID targetId = UUID.randomUUID();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+            adminId.toString(), null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
+
+        controller.listAchievements(targetId, authentication);
+
+        assertThat(service.lastListProgressUserId).isEqualTo(targetId);
+    }
+
+    @Test
+    void listActiveDailyMissions_withAuth_delegatesToService() {
+        FakeAchievementService service = new FakeAchievementService();
+        AchievementController controller = new AchievementController(service);
+        UUID userId = UUID.randomUUID();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+            userId.toString(), null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+
+        List<DailyMissionProgressResponse> result = controller.listActiveDailyMissions(null, authentication);
+
+        assertThat(service.lastActiveMissionsUserId).isEqualTo(userId);
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void claimDailyMissionReward_withAuth_delegatesToService() {
+        FakeAchievementService service = new FakeAchievementService();
+        AchievementController controller = new AchievementController(service);
+        UUID userId = UUID.randomUUID();
+        UUID missionId = UUID.randomUUID();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+            userId.toString(), null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+
+        ClaimRewardResponse result = controller.claimDailyMissionReward(missionId, null, authentication);
+
+        assertThat(service.lastClaimMissionId).isEqualTo(missionId);
+        assertThat(service.lastClaimUserId).isEqualTo(userId);
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    void getTotalClaimedPoints_withAuth_delegatesToService() {
+        FakeAchievementService service = new FakeAchievementService();
+        AchievementController controller = new AchievementController(service);
+        UUID userId = UUID.randomUUID();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+            userId.toString(), null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+
+        int points = controller.getTotalClaimedPoints(null, authentication);
+
+        assertThat(service.lastTotalPointsUserId).isEqualTo(userId);
+        assertThat(points).isEqualTo(42);
+    }
+
+    @Test
+    void pinAchievement_withAuth_delegatesToService() {
+        FakeAchievementService service = new FakeAchievementService();
+        AchievementController controller = new AchievementController(service);
+        UUID userId = UUID.randomUUID();
+        UUID achievementId = UUID.randomUUID();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+            userId.toString(), null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+
+        var response = controller.pinAchievement(achievementId, null, true, authentication);
+
+        assertThat(service.lastPinUserId).isEqualTo(userId);
+        assertThat(service.lastPinAchievementId).isEqualTo(achievementId);
+        assertThat(service.lastPinValue).isTrue();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
     void adminDailyMissionEndpoints_delegateToService() {
         FakeAchievementService service = new FakeAchievementService();
         AchievementController controller = new AchievementController(service);
@@ -98,6 +221,14 @@ class AchievementControllerTest {
         private UUID updatedMissionId;
         private CreateDailyMissionRequest updatedRequest;
         private UUID deletedMissionId;
+        private UUID lastListProgressUserId;
+        private UUID lastActiveMissionsUserId;
+        private UUID lastClaimMissionId;
+        private UUID lastClaimUserId;
+        private UUID lastTotalPointsUserId;
+        private UUID lastPinUserId;
+        private UUID lastPinAchievementId;
+        private boolean lastPinValue;
 
         @Override
         public AchievementResponse createAchievement(CreateAchievementRequest request) {
@@ -106,6 +237,7 @@ class AchievementControllerTest {
 
         @Override
         public List<AchievementProgressResponse> listAchievementProgress(UUID userId) {
+            lastListProgressUserId = userId;
             return List.of();
         }
 
@@ -150,17 +282,22 @@ class AchievementControllerTest {
 
         @Override
         public List<DailyMissionProgressResponse> listActiveDailyMissions(UUID userId) {
-            throw new UnsupportedOperationException();
+            lastActiveMissionsUserId = userId;
+            return List.of();
         }
 
         @Override
         public ClaimRewardResponse claimDailyMissionReward(UUID missionId, UUID userId) {
-            throw new UnsupportedOperationException();
+            lastClaimMissionId = missionId;
+            lastClaimUserId = userId;
+            return new ClaimRewardResponse(missionId, "Daily Read", 10, true, java.time.Instant.now());
         }
 
         @Override
         public void pinAchievement(UUID userId, UUID achievementId, boolean pin) {
-            throw new UnsupportedOperationException();
+            lastPinUserId = userId;
+            lastPinAchievementId = achievementId;
+            lastPinValue = pin;
         }
 
         @Override
@@ -195,7 +332,8 @@ class AchievementControllerTest {
 
         @Override
         public int getTotalClaimedPoints(UUID userId) {
-            throw new UnsupportedOperationException();
+            lastTotalPointsUserId = userId;
+            return 42;
         }
 
         private DailyMissionResponse dailyMissionResponse(UUID missionId, String code, String name) {

@@ -1097,6 +1097,109 @@ class AchievementServiceImplTest {
         assertThat(service.getTotalClaimedPoints(userId)).isEqualTo(30);
     }
 
+    @Test
+    void createDailyMission_nullDatesAndRewardPoints_usesDefaults() {
+        DailyMissionResponse response = service.createDailyMission(new CreateDailyMissionRequest(
+            "DEFAULT_MISSION",
+            "Default Mission",
+            null,
+            AchievementMetric.QUIZ_COMPLETED,
+            1,
+            null,   // null rewardPoints → defaults to 0
+            null,   // null activeFrom → defaults to LocalDate.now()
+            null    // null activeUntil → defaults to activeFrom.plusDays(1)
+        ));
+
+        assertThat(response.code()).isEqualTo("DEFAULT_MISSION");
+        assertThat(response.rewardPoints()).isZero();
+        assertThat(response.activeFrom()).isEqualTo(LocalDate.now());
+        assertThat(response.activeUntil()).isEqualTo(LocalDate.now().plusDays(1));
+    }
+
+    @Test
+    void leagueActivity_duplicateEventIsIdempotent() {
+        UUID userId = UUID.randomUUID();
+        repository.saveAchievement(new Achievement(
+            UUID.randomUUID(),
+            "LEAGUE_ACTIVE",
+            "League Active",
+            "Aktivitas liga.",
+            AchievementMetric.LEAGUE_ACTIVITY,
+            1,
+            true,
+            Instant.now()
+        ));
+        LeagueActivityEvent event = new LeagueActivityEvent(
+            userId, UUID.randomUUID(), UUID.randomUUID(), "QUIZ_COMPLETED", Instant.now()
+        );
+
+        service.recordLeagueActivity(event);
+        service.recordLeagueActivity(event);
+
+        AchievementProgressResponse progress = service.listAchievementProgress(userId).stream()
+            .filter(p -> "LEAGUE_ACTIVE".equals(p.code()))
+            .findFirst().orElseThrow();
+
+        assertThat(progress.progress()).isEqualTo(1);
+        assertThat(rabbitTemplate.publishedEvents.stream()
+            .filter(e -> "yomu.achievement.unlocked".equals(e.routingKey()))
+            .count()).isEqualTo(1);
+    }
+
+    @Test
+    void recordQuizCompleted_skipsAlreadyClaimedDailyMissionProgress() {
+        UUID userId = UUID.randomUUID();
+        DailyMission mission = new DailyMission(
+            UUID.randomUUID(), "DAILY_QUIZ", "Kuis Harian", "Selesaikan satu kuis.",
+            AchievementMetric.QUIZ_COMPLETED, 1, 10,
+            LocalDate.now(), LocalDate.now().plusDays(1), Instant.now()
+        );
+        repository.saveDailyMission(mission);
+
+        service.recordQuizCompleted(new QuizCompletedEvent(
+            userId, UUID.randomUUID(), "quiz-1", 5, 5, Instant.now()));
+        service.claimDailyMissionReward(mission.id(), userId);
+
+        // New quiz event after claiming — mission progress must not re-increment
+        service.recordQuizCompleted(new QuizCompletedEvent(
+            userId, UUID.randomUUID(), "quiz-2", 5, 5, Instant.now()));
+
+        assertThat(service.listActiveDailyMissions(userId).getFirst().claimed()).isTrue();
+    }
+
+    @Test
+    void updateDailyMission_nullDates_keepsExistingDates() {
+        LocalDate today = LocalDate.now();
+        LocalDate until = today.plusDays(3);
+        DailyMission mission = new DailyMission(
+            UUID.randomUUID(),
+            "DATE_MISSION",
+            "Date Mission",
+            "",
+            AchievementMetric.READING_COMPLETED,
+            1,
+            5,
+            today,
+            until,
+            Instant.now()
+        );
+        repository.saveDailyMission(mission);
+
+        DailyMissionResponse response = service.updateDailyMission(mission.id(), new CreateDailyMissionRequest(
+            "DATE_MISSION",
+            "Updated Name",
+            null,
+            AchievementMetric.READING_COMPLETED,
+            1,
+            5,
+            null,  // null activeFrom → keeps existing
+            null   // null activeUntil → keeps existing
+        ));
+
+        assertThat(response.activeFrom()).isEqualTo(today);
+        assertThat(response.activeUntil()).isEqualTo(until);
+    }
+
     private double counterValue(String metricName, String... tags) {
         return Optional.ofNullable(meterRegistry.find(metricName).tags(tags).counter())
             .map(counter -> counter.count())
