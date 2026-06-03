@@ -59,6 +59,33 @@ Average local action latency from the Prometheus snapshot:
 | `create_achievement` success path | 1 | 0.0081141 | 8.11 ms |
 | `create_daily_mission` success path | 1 | 0.0066290 | 6.63 ms |
 
+## Apdex Score
+
+The Apdex score for this profiling run is **1.000**.
+
+This score uses `T = 500 ms` because the Achievements monitoring SLA defines
+normal action latency as `p95 < 500 ms`. Requests at or below `T` are counted as
+satisfied, requests between `T` and `4T` (`2 s`) are counted as tolerating, and
+requests above `4T` are counted as frustrated.
+
+Formula:
+
+```text
+Apdex = (satisfied + (tolerating / 2)) / total
+```
+
+Based on `yomu_achievements_action_duration_seconds` in the Prometheus snapshot:
+
+| Scope | Total samples | Satisfied `<= 500 ms` | Tolerating `> 500 ms and <= 2 s` | Frustrated `> 2 s` | Apdex |
+| :-- | --: | --: | --: | --: | --: |
+| API profiling workload | 454 | 454 | 0 | 0 | 1.000 |
+| Full action timer snapshot, including one scheduler run | 455 | 455 | 0 | 0 | 1.000 |
+
+The highest observed action duration was `rotate_daily_missions` at `19.82 ms`,
+and the slowest API action duration was `claim_daily_mission_reward` failure at
+`8.95 ms`. Because all observed action durations are below `500 ms`, every
+sample in this local profiling run is classified as satisfied.
+
 JFR hot methods were dominated by Spring Boot executable-jar startup and URL/JAR
 loading work, including `java.net.URL.<init>`, `sun.net.www.ParseUtil`, and
 Spring Boot loader methods. Allocation pressure was dominated by `byte[]`,
