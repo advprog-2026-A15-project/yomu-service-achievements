@@ -536,7 +536,7 @@ public class AchievementServiceImpl implements AchievementService {
         String normalized = rawCode.trim()
             .toUpperCase(Locale.ROOT)
             .replaceAll("[^A-Z0-9]+", "_")
-            .replaceAll("^_+|_+$", "");
+            .replaceAll("(^_+)|(_+$)", "");
 
         if (normalized.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
