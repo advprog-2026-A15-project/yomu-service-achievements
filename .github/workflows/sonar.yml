@@ -43,4 +43,9 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: ./gradlew build jacocoTestReport sonar --no-daemon
+        run: ./gradlew build jacocoTestReport jacocoTestCoverageVerification sonar --no-daemon
+          
+      - name: Print Coverage
+        run: |
+          awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print "Coverage: " int(100*covered/instructions) "%" }' build/reports/jacoco/test/jacocoTestReport.csv || echo "Coverage report not found"
+
